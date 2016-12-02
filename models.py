@@ -22,6 +22,36 @@ class Ship(Model):
         if self.x > self.world.width :
             self. x = 0
 
+    def move(self, up, down, left, right):
+        if up:
+            self.y += 2
+        if down:
+            self.y -= 2
+        if left:
+            self.x -= 2
+        if right:
+            self.x += 2
+
+    def turn(self, up, down, left, right):
+        if up :
+            if left :
+                self.angle = 45
+            elif right :
+                self.angle = -45
+            else :
+                self.angle = 0
+        elif down :
+            if left :
+                self.angle = 135
+            elif right :
+                self.angle = 225
+            else :
+                self.angle = 180
+        elif left :
+            self.angle = 90
+        elif right :
+            self.angle = -90
+
 class Planet(Model) :
     def __init__(self, world, x, y):
         super().__init__(world, x, y, 0)
@@ -47,32 +77,8 @@ class World:
         down = key.S in self.key_list
         left = key.A in self.key_list
         right = key.D in self.key_list
-        if up:
-            self.ship.y += 2
-        if down:
-            self.ship.y -= 2
-        if left:
-            self.ship.x -= 2
-        if right:
-            self.ship.x += 2
-        if up :
-            if left :
-                self.ship.angle = 45
-            elif right :
-                self.ship.angle = -45
-            else :
-                self.ship.angle = 0
-        elif down :
-            if left :
-                self.ship.angle = 135
-            elif right :
-                self.ship.angle = 225
-            else :
-                self.ship.angle = 180
-        elif left :
-            self.ship.angle = 90
-        elif right :
-            self.ship.angle = -90
+        self.ship.move(up, down, left, right)
+        self.ship.turn(up, down, left, right)
 
     def on_key_press(self, key, key_modifiers):
         self.key_list.append(key)
