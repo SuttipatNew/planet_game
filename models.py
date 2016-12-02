@@ -1,5 +1,6 @@
 from arcade import key
 from random import randint
+import math
 
 class Model:
     def __init__(self, world, x, y, angle):
