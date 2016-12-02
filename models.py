@@ -1,4 +1,4 @@
-import arcade.key
+from arcade import key
 from random import randint
 
 class Model:
@@ -12,33 +12,15 @@ class Model:
         return (abs(self.x - other.x) <= hit_size) and (abs(self.y - other.y) <= hit_size)
 
 class Ship(Model):
-    DIR_HORIZONTAL = 0
-    DIR_VERTICAL = 1
 
     def __init__(self, world, x, y):
         super().__init__(world, x, y, 0)
-        self.direction = Ship.DIR_VERTICAL
-
-    def switch_direction(self):
-        if self.direction == Ship.DIR_HORIZONTAL:
-            self.direction = Ship.DIR_VERTICAL
-            self.angle = 0
-        else:
-            self.direction = Ship.DIR_HORIZONTAL
-            self.angle = -90
-
-    def forward(self):
-        self.x += 2
 
     def animate(self, delta):
-        if self.direction == Ship.DIR_VERTICAL :
-            if self.y > self.world.height:
-                self.y = 0
-            # self.y += 5
-        else :
-            if self.x > self.world.width :
-                self.x = 0
-            # self.x += 5
+        if self.y > self.world.height:
+            self.y = 0
+        if self.x > self.world.width :
+            self. x = 0
 
 class Planet(Model) :
     def __init__(self, world, x, y):
@@ -61,8 +43,36 @@ class World:
         self.ship.animate(delta)
 
     def update(self):
-        if arcade.key.W in self.key_list:
-            self.ship.forward()
+        up = key.W in self.key_list
+        down = key.S in self.key_list
+        left = key.A in self.key_list
+        right = key.D in self.key_list
+        if up:
+            self.ship.y += 2
+        if down:
+            self.ship.y -= 2
+        if left:
+            self.ship.x -= 2
+        if right:
+            self.ship.x += 2
+        if up :
+            if left :
+                self.ship.angle = 45
+            elif right :
+                self.ship.angle = -45
+            else :
+                self.ship.angle = 0
+        elif down :
+            if left :
+                self.ship.angle = 135
+            elif right :
+                self.ship.angle = 225
+            else :
+                self.ship.angle = 180
+        elif left :
+            self.ship.angle = 90
+        elif right :
+            self.ship.angle = -90
 
     def on_key_press(self, key, key_modifiers):
         self.key_list.append(key)
