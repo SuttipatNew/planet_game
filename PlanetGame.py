@@ -49,8 +49,12 @@ class PlanetGameWindow(arcade.Window):
         self.planet_sprite = ModelSprite('images/planet2.png', model=self.world.planet)
         self.bullet_sprites = []
         self.water_bar_sprites = []
+        self.health_bar_sprites = []
         self.meteorite_sprites = []
         self.ammo_sprites = []
+
+        self.present_score = self.world.score
+        self.present_ammo_num = self.world.ship.ammo_num
 
     def on_draw(self):
         arcade.start_render()
@@ -70,21 +74,28 @@ class PlanetGameWindow(arcade.Window):
         for water_bar_sprite in self.water_bar_sprites:
             water_bar_sprite.draw()
 
+        for health_bar_sprite in self.health_bar_sprites :
+            health_bar_sprite.draw()
 
-        arcade.draw_text("SCORE: " + str(self.world.score), self.width - 120, self.height - 30, arcade.color.WHITE, 16)
-        arcade.draw_text("AMMO: " + str(self.world.ship.ammo_num), self.width - 120, 20, arcade.color.WHITE, 16)
+
+        arcade.draw_text("SCORE: " + str(self.present_score), self.width - 120, self.height - 30, arcade.color.WHITE, 16)
+        arcade.draw_text("AMMO: " + str(self.present_ammo_num), self.width - 120, 20, arcade.color.WHITE, 16)
 
     def animate(self, delta):
         self.world.animate(delta)
         self.create_sprite_for_new_bullet()
         self.remove_unuse_bullet_sprite()
-        self.create_sprite_for_new_water_bar()
+        self.update_water_bar()
+        self.update_health_bar()
         self.create_sprite_for_new_meteorite()
         self.remove_unuse_meteorite_sprite()
         self.remove_bullet_and_meteorite()
         self.ship_on_planet()
         self.create_sprite_for_new_ammo()
         self.ship_pick_ammo()
+        self.meteorite_hit_ship()
+        self.remove_unuse_health_bar()
+        self.update_ui()
 
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
@@ -109,7 +120,7 @@ class PlanetGameWindow(arcade.Window):
                 if(bullet_sprite.model not in self.world.bullets) :
                     self.bullet_sprites.remove(bullet_sprite)
 
-    def create_sprite_for_new_water_bar(self) :
+    def update_water_bar(self) :
         if(len(self.world.water_bar.items) > 0) :
             for water_bar in self.world.water_bar.items :
                 sprite_exists = False
@@ -174,6 +185,43 @@ class PlanetGameWindow(arcade.Window):
                     self.ammo_sprites.remove(ammo_sprite)
                 except:
                     pass
+
+    def update_health_bar(self) :
+        if(len(self.world.health_bar.items) > 0) :
+            for health_bar in self.world.health_bar.items :
+                sprite_exists = False
+                for health_bar_sprite in self.health_bar_sprites :
+                    if health_bar == health_bar_sprite.model :
+                        sprite_exists = True
+                        break
+                if not sprite_exists :
+                    self.health_bar_sprites.append(BarSprite('images/rect-red.png', model=health_bar))
+
+    def meteorite_hit_ship(self) :
+        for meteorite_sprite in self.meteorite_sprites :
+            if arcade.check_for_collision(meteorite_sprite, self.ship_sprite) :
+                try:
+                    self.world.health_bar.items.pop()
+                    self.world.health_bar.items.pop()
+                except:
+                    print('ship destroyed')
+                try:
+                    self.world.meteorites.remove(meteorite_sprite.model)
+                except:
+                    pass
+
+    def remove_unuse_health_bar(self) :
+        for health_bar_sprite in self.health_bar_sprites :
+            if health_bar_sprite.model not in self.world.health_bar.items:
+                self.health_bar_sprites.remove(health_bar_sprite)
+
+    def update_ui(self) :
+        if self.present_score < self.world.score :
+            self.present_score += 1
+        if self.present_ammo_num < self.world.ship.ammo_num :
+            self.present_ammo_num += 1
+        if self.present_ammo_num > self.world.ship.ammo_num :
+            self.present_ammo_num -= 1
 
 if __name__ == '__main__':
     window = PlanetGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)

@@ -76,6 +76,23 @@ class WaterBar(Bar) :
     def __init__(self, world, x, y, max_size) :
         super().__init__(world, x, y, max_size, WaterBar.width)
 
+class HealthBar(Bar) :
+    width = 4
+    height = 4
+    def __init__(self, world, x, y, max_size, ship) :
+        super().__init__(world, x, y, max_size, HealthBar.width)
+        self.ship = ship
+
+    def animate(self, delta) :
+        self.x = self.ship.x
+        self.y = self.ship.y + 80
+        for i in range(len(self.items)) :
+            if i == 0 :
+                self.items[i].x = self.x - self.max_size / 2 * self.width
+            else :
+                self.items[i].x = self.items[i - 1].x + self.width
+            self.items[i].y = self.y
+
 class Meteorite(Model) :
     def __init__(self, world, x, y):
         diff_x = world.planet.x - x
@@ -104,6 +121,9 @@ class World:
         self.planet = Planet(self, 400, 300)
         self.ship = Ship(self, 100, 100)
         self.water_bar = WaterBar(self, self.planet.x,self.planet.y + 100, 40)
+        self.health_bar = HealthBar(self, self.ship.x, self.ship.y + 80, 20, self.ship)
+        for i in range(self.health_bar.max_size) :
+            self.health_bar.add_item()
 
         self.score = 0
 
@@ -119,6 +139,7 @@ class World:
         self.ship.animate(delta)
         self.bullets_animate(delta)
         self.meteorites_animate(delta)
+        self.health_bar.animate(delta)
 
     def update(self):
         up = key.W in self.key_list
@@ -175,7 +196,7 @@ class World:
 
     def create_bullet(self):
         self.bullets.append(Bullet(self, self.ship.x, self.ship.y, self.ship.angle))
-        
+
     def bullets_animate(self, delta) :
         for bullet in self.bullets :
             bullet.animate(delta)
