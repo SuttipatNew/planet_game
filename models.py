@@ -78,6 +78,7 @@ class Meteorite(Model) :
 class Ammo(Model) :
     def __init__(self, world, x, y) :
         super().__init__(world, x, y, 0)
+        self.size = 5
 
 class World:
     def __init__(self, width, height):

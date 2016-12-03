@@ -25,6 +25,9 @@ class PlanetGameWindow(arcade.Window):
 
         arcade.set_background_color(arcade.color.BLACK)
 
+        self.background = arcade.Sprite('images/background.png')
+        self.background.set_position(width/2, height/2)
+
         self.world = World(width, height)
 
         self.ship_sprite = ModelSprite('images/ship.png', model=self.world.ship)
@@ -36,14 +39,15 @@ class PlanetGameWindow(arcade.Window):
 
     def on_draw(self):
         arcade.start_render()
-
+        self.background.draw()
         self.planet_sprite.draw()
         for bullet_sprite in self.bullet_sprites:
             bullet_sprite.draw()
-        self.ship_sprite.draw()
 
         for ammo_sprite in self.ammo_sprites :
             ammo_sprite.draw()
+
+        self.ship_sprite.draw()
 
         for meteorite_sprite in self.meteorite_sprites:
             meteorite_sprite.draw()
@@ -65,6 +69,7 @@ class PlanetGameWindow(arcade.Window):
         self.remove_bullet_and_meteorite()
         self.ship_on_planet()
         self.create_sprite_for_new_ammo()
+        self.ship_pick_ammo()
 
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
@@ -144,6 +149,16 @@ class PlanetGameWindow(arcade.Window):
                         break
                 if not sprite_exists :
                     self.ammo_sprites.append(ModelSprite('images/ammo.png', model=ammo))
+
+    def ship_pick_ammo(self) :
+        for ammo_sprite in self.ammo_sprites :
+            if arcade.check_for_collision(ammo_sprite, self.ship_sprite) :
+                self.world.ship.ammo_num += ammo_sprite.model.size
+                try:
+                    self.world.ammos.remove(ammo_sprite.model)
+                    self.ammo_sprites.remove(ammo_sprite)
+                except:
+                    pass
 
 if __name__ == '__main__':
     window = PlanetGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
