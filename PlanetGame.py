@@ -49,17 +49,7 @@ class PlanetGameWindow(arcade.Window):
         self.world.animate(delta)
         self.create_sprite_for_new_bullet()
         self.remove_unuse_bullet_sprite()
-
-
-        if(len(self.world.water_bars) > 0) :
-            for water_bar in self.world.water_bars :
-                sprite_exists = False
-                for water_bar_sprite in self.water_bar_sprites :
-                    if water_bar == water_bar_sprite.model :
-                        sprite_exists = True
-                        break
-                if not sprite_exists :
-                    self.water_bar_sprites.append(ModelSprite('images/rect-blue.png', model=water_bar))
+        self.create_sprite_for_new_water_bar()
 
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
@@ -83,6 +73,17 @@ class PlanetGameWindow(arcade.Window):
             for bullet_sprite in self.bullet_sprites :
                 if(bullet_sprite.model not in self.world.bullets) :
                     self.bullet_sprites.remove(bullet_sprite)
+
+    def create_sprite_for_new_water_bar(self) :
+        if(len(self.world.water_bars) > 0) :
+            for water_bar in self.world.water_bars :
+                sprite_exists = False
+                for water_bar_sprite in self.water_bar_sprites :
+                    if water_bar == water_bar_sprite.model :
+                        sprite_exists = True
+                        break
+                if not sprite_exists :
+                    self.water_bar_sprites.append(ModelSprite('images/rect-blue.png', model=water_bar))
 
 if __name__ == '__main__':
     window = PlanetGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)

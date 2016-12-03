@@ -86,12 +86,7 @@ class World:
         self.ship.move(up, down)
         self.ship.turn(left, right)
 
-        if(key.SPACE in self.key_list):
-            self.createBullet()
-            try:
-                self.key_list.remove(key.SPACE)
-            except:
-                pass
+        self.update_ship_fire()
 
         if(key.M in self.key_list):
             self.increaseBar()
@@ -110,7 +105,15 @@ class World:
         except:
             pass
 
-    def createBullet(self):
+    def update_ship_fire(self) :
+        if(key.SPACE in self.key_list):
+            self.create_bullet()
+            try:
+                self.key_list.remove(key.SPACE)
+            except:
+                pass
+
+    def create_bullet(self):
         self.bullets.append(Bullet(self, self.ship.x, self.ship.y, self.ship.angle))
 
     def increaseBar(self):
