@@ -29,17 +29,34 @@ class SpaceGameWindow(arcade.Window):
 
         self.ship_sprite = ModelSprite('images/ship.png', model=self.world.ship)
         self.planet_sprite = ModelSprite('images/planet.png', model=self.world.planet)
-
+        self.bullet_sprites = []
 
     def on_draw(self):
         arcade.start_render()
+
         self.planet_sprite.draw()
+        for bullet_sprite in self.bullet_sprites:
+            bullet_sprite.draw()
         self.ship_sprite.draw()
 
         arcade.draw_text(str(self.world.score), self.width - 30, self.height - 30, arcade.color.WHITE, 20)
 
     def animate(self, delta):
-        self.world.animate(delta);
+        self.world.animate(delta)
+
+        if(len(self.world.bullets) > 0) :
+            for bullet in self.world.bullets :
+                sprite_exists = False
+                for bullet_sprite in self.bullet_sprites :
+                    if bullet == bullet_sprite.model :
+                        sprite_exists = True
+                        break
+                if not sprite_exists :
+                    self.bullet_sprites.append(ModelSprite('images/bullet.png', model=bullet))
+        if(len(self.bullet_sprites) > 0) :
+            for bullet_sprite in self.bullet_sprites :
+                if(bullet_sprite.model not in self.world.bullets) :
+                    self.bullet_sprites.remove(bullet_sprite)
 
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)

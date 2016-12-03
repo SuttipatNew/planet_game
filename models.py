@@ -7,7 +7,7 @@ class Model:
         self.world = world
         self.x = x
         self.y = y
-        self.angle = 0
+        self.angle = angle
 
     def hit(self, other, hit_size):
         return (abs(self.x - other.x) <= hit_size) and (abs(self.y - other.y) <= hit_size)
@@ -25,11 +25,11 @@ class Ship(Model):
 
     def move(self, up, down):
         if up :
-            self.x -= math.sin(math.radians(self.angle))
-            self.y += math.cos(math.radians(self.angle))
+            self.x -= math.sin(math.radians(self.angle)) * 2
+            self.y += math.cos(math.radians(self.angle)) * 2
         if down :
-            self.x += math.sin(math.radians(self.angle))
-            self.y -= math.cos(math.radians(self.angle))
+            self.x += math.sin(math.radians(self.angle)) * 2
+            self.y -= math.cos(math.radians(self.angle)) * 2
 
     def turn(self, left, right):
         if left :
@@ -42,6 +42,14 @@ class Planet(Model) :
     def __init__(self, world, x, y):
         super().__init__(world, x, y, 0)
 
+class Bullet(Model) :
+    def __init__(self, world, x, y, angle):
+        super().__init__(world, x, y, angle)
+
+    def animate(self, delta) :
+        self.x -= math.sin(math.radians(self.angle)) * 4
+        self.y += math.cos(math.radians(self.angle)) * 4
+
 class World:
     def __init__(self, width, height):
         self.width = width
@@ -53,10 +61,15 @@ class World:
         self.score = 0
 
         self.key_list = []
+        self.bullets = []
 
     def animate(self, delta):
         self.update()
         self.ship.animate(delta)
+        for bullet in self.bullets :
+            bullet.animate(delta)
+            if bullet.x < 0 or bullet.x > self.width or bullet.y < 0 or bullet.y > self.height :
+                self.bullets.remove(bullet)
 
     def update(self):
         up = key.W in self.key_list
@@ -66,8 +79,21 @@ class World:
         self.ship.move(up, down)
         self.ship.turn(left, right)
 
+        if(key.SPACE in self.key_list):
+            self.createBullet()
+            try:
+                self.key_list.remove(key.SPACE)
+            except:
+                pass
+
     def on_key_press(self, key, key_modifiers):
         self.key_list.append(key)
 
     def on_key_release(self, key, key_modifiers):
-        self.key_list.remove(key)
+        try:
+            self.key_list.remove(key)
+        except:
+            pass
+
+    def createBullet(self):
+        self.bullets.append(Bullet(self, self.ship.x, self.ship.y, self.ship.angle))
