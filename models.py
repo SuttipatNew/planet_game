@@ -109,13 +109,6 @@ class World:
 
         self.update_meteorites()
 
-        # if(key.M in self.key_list):
-        #     self.increaseBar()
-        #     try:
-        #         self.key_list.remove(key.M)
-        #     except:
-        #         pass
-
 
     def on_key_press(self, key, key_modifiers):
         self.key_list.append(key)
