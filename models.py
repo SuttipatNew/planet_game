@@ -57,11 +57,7 @@ class WaterBar(Model) :
         super().__init__(world, x, y, 0)
 
 class Meteorite(Model) :
-    def __init__(self, world):
-        # x = randint(world.width, world.width + 100)
-        # y = randint(world.height, world.height + 100)
-        x = 100.0
-        y = 550.0
+    def __init__(self, world, x, y):
         diff_x = world.planet.x - x
         diff_y = world.planet.y - y
         rad = math.atan(float(diff_y) / diff_x)
@@ -69,7 +65,7 @@ class Meteorite(Model) :
         if(x > world.planet.x) :
             angle += 180
         super().__init__(world, x, y, angle)
-        self.velocity = 2
+        self.velocity = 0.5
 
     def animate(self, delta):
         self.x += math.cos(math.radians(self.angle)) * self.velocity
@@ -82,10 +78,10 @@ class World:
 
         self.planet = Planet(self, 400, 300)
         self.ship = Ship(self, 100, 100)
-        self.meteorite = Meteorite(self)
 
         self.score = 0
 
+        self.meteorites = []
         self.water_bars = []
         self.key_list = []
         self.bullets = []
@@ -97,10 +93,10 @@ class World:
             bullet.animate(delta)
             if bullet.x < 0 or bullet.x > self.width or bullet.y < 0 or bullet.y > self.height :
                 self.bullets.remove(bullet)
-        self.meteorite.animate(delta)
-        if self.meteorite.x < 0 or self.meteorite.x > self.width or self.meteorite.y < 0 or self.meteorite.y > self.height :
-            self.meteorite.x = randint(0, self.width-1)
-            self.meteorite.y = randint(0, self.height-1)
+        for meteorite in self.meteorites :
+            meteorite.animate(delta)
+            if meteorite.x < 0 or meteorite.x > self.width or meteorite.y < 0 or meteorite.y > self.height :
+                self.meteorites.remove(meteorite)
 
     def update(self):
         up = key.W in self.key_list
@@ -111,6 +107,8 @@ class World:
         self.ship.turn(left, right)
 
         self.update_ship_fire()
+
+        self.update_meteorites()
 
         if(key.M in self.key_list):
             self.increaseBar()
@@ -136,6 +134,12 @@ class World:
                 self.key_list.remove(key.SPACE)
             except:
                 pass
+
+    def update_meteorites(self) :
+        if(len(self.meteorites) < 3) :
+            x = randint(0, self.width - 1)
+            y = randint(0, self.height - 1)
+            self.meteorites.append(Meteorite(self, x, y))
 
     def create_bullet(self):
         self.bullets.append(Bullet(self, self.ship.x, self.ship.y, self.ship.angle))

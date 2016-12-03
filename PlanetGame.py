@@ -29,9 +29,9 @@ class PlanetGameWindow(arcade.Window):
 
         self.ship_sprite = ModelSprite('images/ship.png', model=self.world.ship)
         self.planet_sprite = ModelSprite('images/planet.png', model=self.world.planet)
-        self.meteorite_sprite = ModelSprite('images/meteorite.png', model=self.world.meteorite)
         self.bullet_sprites = []
         self.water_bar_sprites = []
+        self.meteorite_sprites = []
 
     def on_draw(self):
         arcade.start_render()
@@ -41,7 +41,8 @@ class PlanetGameWindow(arcade.Window):
             bullet_sprite.draw()
         self.ship_sprite.draw()
 
-        self.meteorite_sprite.draw()
+        for meteorite_sprite in self.meteorite_sprites:
+            meteorite_sprite.draw()
 
         for water_bar_sprite in self.water_bar_sprites:
             water_bar_sprite.draw()
@@ -53,6 +54,8 @@ class PlanetGameWindow(arcade.Window):
         self.create_sprite_for_new_bullet()
         self.remove_unuse_bullet_sprite()
         self.create_sprite_for_new_water_bar()
+        self.create_sprite_for_new_meteorite()
+        self.remove_unuse_meteorite_sprite()
 
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
@@ -87,6 +90,23 @@ class PlanetGameWindow(arcade.Window):
                         break
                 if not sprite_exists :
                     self.water_bar_sprites.append(ModelSprite('images/rect-blue.png', model=water_bar))
+
+    def create_sprite_for_new_meteorite(self) :
+        if(len(self.world.meteorites) > 0) :
+            for meteorite in self.world.meteorites :
+                sprite_exists = False
+                for meteorite_sprite in self.meteorite_sprites :
+                    if meteorite == meteorite_sprite.model :
+                        sprite_exists = True
+                        break
+                if not sprite_exists :
+                    self.meteorite_sprites.append(ModelSprite('images/meteorite.png', model=meteorite))
+
+    def remove_unuse_meteorite_sprite(self) :
+        if(len(self.meteorite_sprites) > 0) :
+            for meteorite_sprite in self.meteorite_sprites :
+                if(meteorite_sprite.model not in self.world.meteorites) :
+                    self.meteorite_sprites.remove(meteorite_sprite)
 
 if __name__ == '__main__':
     window = PlanetGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
