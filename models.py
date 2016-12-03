@@ -18,6 +18,7 @@ class Ship(Model):
 
     def __init__(self, world, x, y):
         super().__init__(world, x, y, 90)
+        self.ammo = 10
 
     def animate(self, delta):
         if self.y > self.world.height:
@@ -120,8 +121,9 @@ class World:
             pass
 
     def update_ship_fire(self) :
-        if(key.SPACE in self.key_list):
+        if key.SPACE in self.key_list and self.ship.ammo > 0:
             self.create_bullet()
+            self.ship.ammo -= 1
             try:
                 self.key_list.remove(key.SPACE)
             except:

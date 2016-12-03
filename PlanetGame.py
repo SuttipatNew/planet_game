@@ -47,7 +47,8 @@ class PlanetGameWindow(arcade.Window):
         for water_bar_sprite in self.water_bar_sprites:
             water_bar_sprite.draw()
 
-        arcade.draw_text(str(self.world.score), self.width - 30, self.height - 30, arcade.color.WHITE, 20)
+        arcade.draw_text("SCORE: " + str(self.world.score), self.width - 120, self.height - 30, arcade.color.WHITE, 16)
+        arcade.draw_text("AMMO: " + str(self.world.ship.ammo), self.width - 120, 20, arcade.color.WHITE, 16)
 
     def animate(self, delta):
         self.world.animate(delta)
@@ -114,9 +115,8 @@ class PlanetGameWindow(arcade.Window):
         for bullet_sprite in self.bullet_sprites :
             for meteorite_sprite in self.meteorite_sprites :
                 if arcade.check_for_collision(bullet_sprite, meteorite_sprite) :
+                    self.world.score += 1
                     try:
-                        # self.bullet_sprites.remove(bullet_sprite)
-                        # self.meteorite_sprites.remove(meteorite_sprite)
                         self.world.bullets.remove(bullet_sprite.model)
                         self.world.meteorites.remove(meteorite_sprite.model)
                     except:
