@@ -50,6 +50,12 @@ class Bullet(Model) :
         self.x -= math.sin(math.radians(self.angle)) * 4
         self.y += math.cos(math.radians(self.angle)) * 4
 
+class WaterBar(Model) :
+    width = 4
+    height = 16
+    def __init__(self, world, x, y) :
+        super().__init__(world, x, y, 0)
+
 class World:
     def __init__(self, width, height):
         self.width = width
@@ -60,6 +66,7 @@ class World:
 
         self.score = 0
 
+        self.water_bars = []
         self.key_list = []
         self.bullets = []
 
@@ -86,6 +93,14 @@ class World:
             except:
                 pass
 
+        if(key.M in self.key_list):
+            self.increaseBar()
+            try:
+                self.key_list.remove(key.M)
+            except:
+                pass
+
+
     def on_key_press(self, key, key_modifiers):
         self.key_list.append(key)
 
@@ -97,3 +112,9 @@ class World:
 
     def createBullet(self):
         self.bullets.append(Bullet(self, self.ship.x, self.ship.y, self.ship.angle))
+
+    def increaseBar(self):
+        if len(self.water_bars) == 0 :
+            self.water_bars.append(WaterBar(self, 200, 500))
+            return
+        self.water_bars.append(WaterBar(self, self.water_bars[len(self.water_bars) - 1].x + WaterBar.width, 500))

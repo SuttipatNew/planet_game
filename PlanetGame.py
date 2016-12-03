@@ -19,7 +19,7 @@ class ModelSprite(arcade.Sprite):
         self.sync_with_model()
         super().draw()
 
-class SpaceGameWindow(arcade.Window):
+class PlanetGameWindow(arcade.Window):
     def __init__(self, width, height):
         super().__init__(width, height)
 
@@ -30,6 +30,7 @@ class SpaceGameWindow(arcade.Window):
         self.ship_sprite = ModelSprite('images/ship.png', model=self.world.ship)
         self.planet_sprite = ModelSprite('images/planet.png', model=self.world.planet)
         self.bullet_sprites = []
+        self.water_bar_sprites = []
 
     def on_draw(self):
         arcade.start_render()
@@ -39,11 +40,34 @@ class SpaceGameWindow(arcade.Window):
             bullet_sprite.draw()
         self.ship_sprite.draw()
 
+        for water_bar_sprite in self.water_bar_sprites:
+            water_bar_sprite.draw()
+
         arcade.draw_text(str(self.world.score), self.width - 30, self.height - 30, arcade.color.WHITE, 20)
 
     def animate(self, delta):
         self.world.animate(delta)
+        self.create_sprite_for_new_bullet()
+        self.remove_unuse_bullet_sprite()
 
+
+        if(len(self.world.water_bars) > 0) :
+            for water_bar in self.world.water_bars :
+                sprite_exists = False
+                for water_bar_sprite in self.water_bar_sprites :
+                    if water_bar == water_bar_sprite.model :
+                        sprite_exists = True
+                        break
+                if not sprite_exists :
+                    self.water_bar_sprites.append(ModelSprite('images/rect-blue.png', model=water_bar))
+
+    def on_key_press(self, key, key_modifiers):
+        self.world.on_key_press(key, key_modifiers)
+
+    def on_key_release(self, key, key_modifiers):
+        self.world.on_key_release(key, key_modifiers)
+
+    def create_sprite_for_new_bullet(self) :
         if(len(self.world.bullets) > 0) :
             for bullet in self.world.bullets :
                 sprite_exists = False
@@ -53,17 +77,13 @@ class SpaceGameWindow(arcade.Window):
                         break
                 if not sprite_exists :
                     self.bullet_sprites.append(ModelSprite('images/bullet.png', model=bullet))
+
+    def remove_unuse_bullet_sprite(self) :
         if(len(self.bullet_sprites) > 0) :
             for bullet_sprite in self.bullet_sprites :
                 if(bullet_sprite.model not in self.world.bullets) :
                     self.bullet_sprites.remove(bullet_sprite)
 
-    def on_key_press(self, key, key_modifiers):
-        self.world.on_key_press(key, key_modifiers)
-
-    def on_key_release(self, key, key_modifiers):
-        self.world.on_key_release(key, key_modifiers)
-
 if __name__ == '__main__':
-    window = SpaceGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
+    window = PlanetGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
     arcade.run()
