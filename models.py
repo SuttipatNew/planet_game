@@ -89,14 +89,8 @@ class World:
     def animate(self, delta):
         self.update()
         self.ship.animate(delta)
-        for bullet in self.bullets :
-            bullet.animate(delta)
-            if bullet.x < 0 or bullet.x > self.width or bullet.y < 0 or bullet.y > self.height :
-                self.bullets.remove(bullet)
-        for meteorite in self.meteorites :
-            meteorite.animate(delta)
-            if meteorite.x < 0 or meteorite.x > self.width or meteorite.y < 0 or meteorite.y > self.height :
-                self.meteorites.remove(meteorite)
+        self.bullets_animate(delta)
+        self.meteorites_animate(delta)
 
     def update(self):
         up = key.W in self.key_list
@@ -149,3 +143,15 @@ class World:
             self.water_bars.append(WaterBar(self, 200, 500))
             return
         self.water_bars.append(WaterBar(self, self.water_bars[len(self.water_bars) - 1].x + WaterBar.width, 500))
+
+    def bullets_animate(self, delta) :
+        for bullet in self.bullets :
+            bullet.animate(delta)
+            if bullet.x < 0 or bullet.x > self.width or bullet.y < 0 or bullet.y > self.height :
+                self.bullets.remove(bullet)
+
+    def meteorites_animate(self, delta) :
+        for meteorite in self.meteorites :
+            meteorite.animate(delta)
+            if meteorite.x < 0 or meteorite.x > self.width or meteorite.y < 0 or meteorite.y > self.height :
+                self.meteorites.remove(meteorite)
