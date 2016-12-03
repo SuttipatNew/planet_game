@@ -1,6 +1,7 @@
 from arcade import key
 from random import randint
 from random import random
+from time import time
 import math
 
 class Model:
@@ -88,6 +89,8 @@ class World:
         self.key_list = []
         self.bullets = []
 
+        self.water_bar_update_counter = time()
+
     def animate(self, delta):
         self.update()
         self.ship.animate(delta)
@@ -106,12 +109,12 @@ class World:
 
         self.update_meteorites()
 
-        if(key.M in self.key_list):
-            self.increaseBar()
-            try:
-                self.key_list.remove(key.M)
-            except:
-                pass
+        # if(key.M in self.key_list):
+        #     self.increaseBar()
+        #     try:
+        #         self.key_list.remove(key.M)
+        #     except:
+        #         pass
 
 
     def on_key_press(self, key, key_modifiers):
@@ -156,7 +159,7 @@ class World:
     def create_bullet(self):
         self.bullets.append(Bullet(self, self.ship.x, self.ship.y, self.ship.angle))
 
-    def increaseBar(self):
+    def increase_water_bar(self):
         if len(self.water_bars) >= WaterBar.max_bars :
             return
         if len(self.water_bars) == 0 :
@@ -175,6 +178,12 @@ class World:
             meteorite.animate(delta)
             if meteorite.x < 0 or meteorite.x > self.width or meteorite.y < 0 or meteorite.y > self.height :
                 self.meteorites.remove(meteorite)
+
+    def ship_on_planet(self) :
+        if time() - self.water_bar_update_counter >= 1 :
+            self.water_bar_update_counter = time()
+            self.increase_water_bar()
+
 
 def random_prob(prob) :
     return random() <= prob

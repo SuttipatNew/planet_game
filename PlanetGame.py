@@ -57,6 +57,7 @@ class PlanetGameWindow(arcade.Window):
         self.create_sprite_for_new_meteorite()
         self.remove_unuse_meteorite_sprite()
         self.remove_bullet_and_meteorite()
+        self.ship_on_planet()
 
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
@@ -120,6 +121,10 @@ class PlanetGameWindow(arcade.Window):
                         self.world.meteorites.remove(meteorite_sprite.model)
                     except:
                         pass
+
+    def ship_on_planet(self) :
+        if arcade.check_for_collision(self.ship_sprite, self.planet_sprite) :
+            self.world.ship_on_planet()
 
 if __name__ == '__main__':
     window = PlanetGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
