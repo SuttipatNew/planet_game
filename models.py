@@ -11,9 +11,6 @@ class Model:
         self.y = y
         self.angle = angle
 
-    def hit(self, other, hit_size):
-        return (abs(self.x - other.x) <= hit_size) and (abs(self.y - other.y) <= hit_size)
-
 class Ship(Model):
 
     def __init__(self, world, x, y):
@@ -39,7 +36,6 @@ class Ship(Model):
             self.angle += 2
         if right :
             self.angle -= 2
-
 
 class Planet(Model) :
     def __init__(self, world, x, y):
