@@ -28,7 +28,7 @@ class PlanetGameWindow(arcade.Window):
         self.world = World(width, height)
 
         self.ship_sprite = ModelSprite('images/ship.png', model=self.world.ship)
-        self.planet_sprite = ModelSprite('images/planet.png', model=self.world.planet)
+        self.planet_sprite = ModelSprite('images/planet2.png', model=self.world.planet)
         self.bullet_sprites = []
         self.water_bar_sprites = []
         self.meteorite_sprites = []

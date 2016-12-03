@@ -1,5 +1,6 @@
 from arcade import key
 from random import randint
+from random import random
 import math
 
 class Model:
@@ -131,10 +132,26 @@ class World:
                 pass
 
     def update_meteorites(self) :
-        if(len(self.meteorites) < 3) :
-            x = randint(0, self.width - 1)
-            y = randint(0, self.height - 1)
-            self.meteorites.append(Meteorite(self, x, y))
+        if(len(self.meteorites) < 5) :
+            if random_prob(0.01) :
+                rand_num = randint(0,3)
+                on_right = rand_num == 0
+                on_top = rand_num == 1
+                on_left = rand_num == 2
+                x = 0; y = 0
+                if on_right or on_left:
+                    y = randint(0, self.height - 1)
+                    if on_right :
+                        x = self.width + 50
+                    else :
+                        x = 0
+                else :
+                    x = randint(0, self.width)
+                    if on_top :
+                        y = self.height
+                    else :
+                        y = 0
+                self.meteorites.append(Meteorite(self, x, y))
 
     def create_bullet(self):
         self.bullets.append(Bullet(self, self.ship.x, self.ship.y, self.ship.angle))
@@ -158,3 +175,6 @@ class World:
             meteorite.animate(delta)
             if meteorite.x < 0 or meteorite.x > self.width or meteorite.y < 0 or meteorite.y > self.height :
                 self.meteorites.remove(meteorite)
+
+def random_prob(prob) :
+    return random() <= prob
