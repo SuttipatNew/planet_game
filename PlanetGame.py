@@ -19,6 +19,21 @@ class ModelSprite(arcade.Sprite):
         self.sync_with_model()
         super().draw()
 
+class BarSprite(arcade.Sprite):
+    def __init__(self, *args, **kwargs):
+        self.model = kwargs.pop('model', None)
+
+        super().__init__(*args, **kwargs)
+
+    def sync_with_model(self):
+        if self.model:
+            self.set_position(self.model.x, self.model.y)
+            # self.angle = 0
+
+    def draw(self):
+        self.sync_with_model()
+        super().draw()
+
 class PlanetGameWindow(arcade.Window):
     def __init__(self, width, height):
         super().__init__(width, height)
@@ -95,15 +110,15 @@ class PlanetGameWindow(arcade.Window):
                     self.bullet_sprites.remove(bullet_sprite)
 
     def create_sprite_for_new_water_bar(self) :
-        if(len(self.world.water_bars) > 0) :
-            for water_bar in self.world.water_bars :
+        if(len(self.world.water_bar.items) > 0) :
+            for water_bar in self.world.water_bar.items :
                 sprite_exists = False
                 for water_bar_sprite in self.water_bar_sprites :
                     if water_bar == water_bar_sprite.model :
                         sprite_exists = True
                         break
                 if not sprite_exists :
-                    self.water_bar_sprites.append(ModelSprite('images/rect-blue.png', model=water_bar))
+                    self.water_bar_sprites.append(BarSprite('images/rect-blue.png', model=water_bar))
 
     def create_sprite_for_new_meteorite(self) :
         if(len(self.world.meteorites) > 0) :

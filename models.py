@@ -11,6 +11,27 @@ class Model:
         self.y = y
         self.angle = angle
 
+class Bar:
+    def __init__(self, world, x, y, max_size, width) :
+        self.x = x
+        self.y = y
+        self.max_size = max_size
+        self.width = width
+        self.items = []
+
+    def add_item(self) :
+        if len(self.items) >= self.max_size :
+            return
+        if len(self.items) == 0 :
+            self.items.append(Item(self, self.x - self.max_size / 2 * self.width, self.y))
+            return
+        self.items.append(Item(self, self.items[len(self.items) - 1].x + self.width, self.y))
+
+class Item:
+    def __init__(self, world, x, y):
+        self.x = x
+        self.y = y
+
 class Ship(Model):
 
     def __init__(self, world, x, y):
@@ -49,12 +70,11 @@ class Bullet(Model) :
         self.x += math.cos(math.radians(self.angle)) * 4
         self.y += math.sin(math.radians(self.angle)) * 4
 
-class WaterBar(Model) :
+class WaterBar(Bar) :
     width = 4
     height = 16
-    max_bars = 40
-    def __init__(self, world, x, y) :
-        super().__init__(world, x, y, 0)
+    def __init__(self, world, x, y, max_size) :
+        super().__init__(world, x, y, max_size, WaterBar.width)
 
 class Meteorite(Model) :
     def __init__(self, world, x, y):
@@ -83,11 +103,11 @@ class World:
 
         self.planet = Planet(self, 400, 300)
         self.ship = Ship(self, 100, 100)
+        self.water_bar = WaterBar(self, self.planet.x,self.planet.y + 100, 40)
 
         self.score = 0
 
         self.meteorites = []
-        self.water_bars = []
         self.key_list = []
         self.bullets = []
         self.ammos = []
@@ -155,15 +175,7 @@ class World:
 
     def create_bullet(self):
         self.bullets.append(Bullet(self, self.ship.x, self.ship.y, self.ship.angle))
-
-    def increase_water_bar(self):
-        if len(self.water_bars) >= WaterBar.max_bars :
-            return
-        if len(self.water_bars) == 0 :
-            self.water_bars.append(WaterBar(self, self.planet.x - WaterBar.max_bars / 2 * WaterBar.width, self.planet.y + 100))
-            return
-        self.water_bars.append(WaterBar(self, self.water_bars[len(self.water_bars) - 1].x + WaterBar.width, self.planet.y + 100))
-
+        
     def bullets_animate(self, delta) :
         for bullet in self.bullets :
             bullet.animate(delta)
@@ -179,7 +191,7 @@ class World:
     def ship_on_planet(self) :
         if time() - self.water_bar_update_counter >= 1 :
             self.water_bar_update_counter = time()
-            self.increase_water_bar()
+            self.water_bar.add_item()
 
     def create_ammo(self, x, y) :
         self.ammos.append(Ammo(self, x, y))
