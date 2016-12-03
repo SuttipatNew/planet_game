@@ -15,7 +15,7 @@ class Model:
 class Ship(Model):
 
     def __init__(self, world, x, y):
-        super().__init__(world, x, y, 0)
+        super().__init__(world, x, y, 90)
 
     def animate(self, delta):
         if self.y > self.world.height:
@@ -25,11 +25,11 @@ class Ship(Model):
 
     def move(self, up, down):
         if up :
-            self.x -= math.sin(math.radians(self.angle)) * 2
-            self.y += math.cos(math.radians(self.angle)) * 2
+            self.x += math.cos(math.radians(self.angle)) * 2
+            self.y += math.sin(math.radians(self.angle)) * 2
         if down :
-            self.x += math.sin(math.radians(self.angle)) * 2
-            self.y -= math.cos(math.radians(self.angle)) * 2
+            self.x -= math.cos(math.radians(self.angle)) * 2
+            self.y -= math.sin(math.radians(self.angle)) * 2
 
     def turn(self, left, right):
         if left :
@@ -47,14 +47,20 @@ class Bullet(Model) :
         super().__init__(world, x, y, angle)
 
     def animate(self, delta) :
-        self.x -= math.sin(math.radians(self.angle)) * 4
-        self.y += math.cos(math.radians(self.angle)) * 4
+        self.x += math.cos(math.radians(self.angle)) * 4
+        self.y += math.sin(math.radians(self.angle)) * 4
 
 class WaterBar(Model) :
     width = 4
     height = 16
     def __init__(self, world, x, y) :
         super().__init__(world, x, y, 0)
+
+# class Meteorite(Model) :
+#     def __init__(self, world):
+#         x = randint(world.width, world.width + 100)
+#         y = randint(world.height, world.height + 100)
+#         super().__init__(world, x, y, 0)
 
 class World:
     def __init__(self, width, height):
