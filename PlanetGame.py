@@ -56,6 +56,7 @@ class PlanetGameWindow(arcade.Window):
         self.create_sprite_for_new_water_bar()
         self.create_sprite_for_new_meteorite()
         self.remove_unuse_meteorite_sprite()
+        self.remove_bullet_and_meteorite()
 
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
@@ -107,6 +108,18 @@ class PlanetGameWindow(arcade.Window):
             for meteorite_sprite in self.meteorite_sprites :
                 if(meteorite_sprite.model not in self.world.meteorites) :
                     self.meteorite_sprites.remove(meteorite_sprite)
+
+    def remove_bullet_and_meteorite(self) :
+        for bullet_sprite in self.bullet_sprites :
+            for meteorite_sprite in self.meteorite_sprites :
+                if arcade.check_for_collision(bullet_sprite, meteorite_sprite) :
+                    try:
+                        # self.bullet_sprites.remove(bullet_sprite)
+                        # self.meteorite_sprites.remove(meteorite_sprite)
+                        self.world.bullets.remove(bullet_sprite.model)
+                        self.world.meteorites.remove(meteorite_sprite.model)
+                    except:
+                        pass
 
 if __name__ == '__main__':
     window = PlanetGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)

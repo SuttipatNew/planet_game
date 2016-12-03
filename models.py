@@ -53,6 +53,7 @@ class Bullet(Model) :
 class WaterBar(Model) :
     width = 4
     height = 16
+    max_bars = 40
     def __init__(self, world, x, y) :
         super().__init__(world, x, y, 0)
 
@@ -139,10 +140,12 @@ class World:
         self.bullets.append(Bullet(self, self.ship.x, self.ship.y, self.ship.angle))
 
     def increaseBar(self):
-        if len(self.water_bars) == 0 :
-            self.water_bars.append(WaterBar(self, 200, 500))
+        if len(self.water_bars) >= WaterBar.max_bars :
             return
-        self.water_bars.append(WaterBar(self, self.water_bars[len(self.water_bars) - 1].x + WaterBar.width, 500))
+        if len(self.water_bars) == 0 :
+            self.water_bars.append(WaterBar(self, self.planet.x - WaterBar.max_bars / 2 * WaterBar.width, self.planet.y + 100))
+            return
+        self.water_bars.append(WaterBar(self, self.water_bars[len(self.water_bars) - 1].x + WaterBar.width, self.planet.y + 100))
 
     def bullets_animate(self, delta) :
         for bullet in self.bullets :
