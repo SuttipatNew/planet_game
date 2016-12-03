@@ -56,19 +56,33 @@ class WaterBar(Model) :
     def __init__(self, world, x, y) :
         super().__init__(world, x, y, 0)
 
-# class Meteorite(Model) :
-#     def __init__(self, world):
-#         x = randint(world.width, world.width + 100)
-#         y = randint(world.height, world.height + 100)
-#         super().__init__(world, x, y, 0)
+class Meteorite(Model) :
+    def __init__(self, world):
+        # x = randint(world.width, world.width + 100)
+        # y = randint(world.height, world.height + 100)
+        x = 100.0
+        y = 550.0
+        diff_x = world.planet.x - x
+        diff_y = world.planet.y - y
+        rad = math.atan(float(diff_y) / diff_x)
+        angle = math.degrees(rad)
+        if(x > world.planet.x) :
+            angle += 180
+        super().__init__(world, x, y, angle)
+        self.velocity = 2
+
+    def animate(self, delta):
+        self.x += math.cos(math.radians(self.angle)) * self.velocity
+        self.y += math.sin(math.radians(self.angle)) * self.velocity
 
 class World:
     def __init__(self, width, height):
         self.width = width
         self.height = height
 
-        self.planet = Planet(self, 200, 300)
+        self.planet = Planet(self, 400, 300)
         self.ship = Ship(self, 100, 100)
+        self.meteorite = Meteorite(self)
 
         self.score = 0
 
@@ -83,6 +97,10 @@ class World:
             bullet.animate(delta)
             if bullet.x < 0 or bullet.x > self.width or bullet.y < 0 or bullet.y > self.height :
                 self.bullets.remove(bullet)
+        self.meteorite.animate(delta)
+        if self.meteorite.x < 0 or self.meteorite.x > self.width or self.meteorite.y < 0 or self.meteorite.y > self.height :
+            self.meteorite.x = randint(0, self.width-1)
+            self.meteorite.y = randint(0, self.height-1)
 
     def update(self):
         up = key.W in self.key_list

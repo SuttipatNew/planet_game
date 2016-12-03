@@ -29,6 +29,7 @@ class PlanetGameWindow(arcade.Window):
 
         self.ship_sprite = ModelSprite('images/ship.png', model=self.world.ship)
         self.planet_sprite = ModelSprite('images/planet.png', model=self.world.planet)
+        self.meteorite_sprite = ModelSprite('images/meteorite.png', model=self.world.meteorite)
         self.bullet_sprites = []
         self.water_bar_sprites = []
 
@@ -39,6 +40,8 @@ class PlanetGameWindow(arcade.Window):
         for bullet_sprite in self.bullet_sprites:
             bullet_sprite.draw()
         self.ship_sprite.draw()
+
+        self.meteorite_sprite.draw()
 
         for water_bar_sprite in self.water_bar_sprites:
             water_bar_sprite.draw()
