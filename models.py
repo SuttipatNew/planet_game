@@ -18,7 +18,7 @@ class Ship(Model):
 
     def __init__(self, world, x, y):
         super().__init__(world, x, y, 90)
-        self.ammo = 10
+        self.ammo_num = 10
 
     def animate(self, delta):
         if self.y > self.world.height:
@@ -75,6 +75,10 @@ class Meteorite(Model) :
         self.x += math.cos(math.radians(self.angle)) * self.velocity
         self.y += math.sin(math.radians(self.angle)) * self.velocity
 
+class Ammo(Model) :
+    def __init__(self, world, x, y) :
+        super().__init__(world, x, y, 0)
+
 class World:
     def __init__(self, width, height):
         self.width = width
@@ -89,6 +93,7 @@ class World:
         self.water_bars = []
         self.key_list = []
         self.bullets = []
+        self.ammos = []
 
         self.water_bar_update_counter = time()
 
@@ -121,9 +126,9 @@ class World:
             pass
 
     def update_ship_fire(self) :
-        if key.SPACE in self.key_list and self.ship.ammo > 0:
+        if key.SPACE in self.key_list and self.ship.ammo_num > 0:
             self.create_bullet()
-            self.ship.ammo -= 1
+            self.ship.ammo_num -= 1
             try:
                 self.key_list.remove(key.SPACE)
             except:
@@ -178,6 +183,9 @@ class World:
         if time() - self.water_bar_update_counter >= 1 :
             self.water_bar_update_counter = time()
             self.increase_water_bar()
+
+    def create_ammo(self, x, y) :
+        self.ammos.append(Ammo(self, x, y))
 
 
 def random_prob(prob) :
