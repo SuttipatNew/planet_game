@@ -97,7 +97,11 @@ class Meteorite(Model) :
     def __init__(self, world, x, y):
         diff_x = world.planet.x - x
         diff_y = world.planet.y - y
-        rad = math.atan(float(diff_y) / diff_x)
+        rad = None
+        if diff_x != 0 :
+            rad = math.atan(float(diff_y) / diff_x)
+        else :
+            rad = math.pi / 2
         angle = math.degrees(rad)
         if(x > world.planet.x) :
             angle += 180
@@ -232,6 +236,7 @@ class World:
             if bullet.x < 0 or bullet.x > self.width or bullet.y < 0 or bullet.y > self.height :
                 self.bullet_listenner.notify('remove', bullet)
                 self.bullets.remove(bullet)
+                del bullet
 
     def meteorites_animate(self, delta) :
         for meteorite in self.meteorites :
@@ -239,6 +244,7 @@ class World:
             if meteorite.x < 0 or meteorite.x > self.width or meteorite.y < 0 or meteorite.y > self.height :
                 self.meteorite_listenner.notify('remove', meteorite)
                 self.meteorites.remove(meteorite)
+                del meteorite
 
     def ship_on_planet(self) :
         if time() - self.water_bar_update_counter >= 1 :

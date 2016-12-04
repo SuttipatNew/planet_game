@@ -101,7 +101,7 @@ class PlanetGameWindow(arcade.Window):
 
     def on_key_release(self, key, key_modifiers):
         self.world.on_key_release(key, key_modifiers)
-        
+
     def update_water_bar(self) :
         if(len(self.world.water_bar.items) > 0) :
             for water_bar in self.world.water_bar.items :
@@ -125,8 +125,13 @@ class PlanetGameWindow(arcade.Window):
                         self.bullet_sprites.remove(bullet_sprite)
                         self.world.meteorites.remove(meteorite_sprite.model)
                         self.meteorite_sprites.remove(meteorite_sprite)
+                        del bullet_sprite.model
+                        del bullet_sprite
+                        del meteorite_sprite.model
+                        del meteorite_sprite
                     except:
                         pass
+                    return
 
     def ship_on_planet(self) :
         if arcade.check_for_collision(self.ship_sprite, self.planet_sprite) :
@@ -150,8 +155,11 @@ class PlanetGameWindow(arcade.Window):
                 try:
                     self.world.ammos.remove(ammo_sprite.model)
                     self.ammo_sprites.remove(ammo_sprite)
+                    del ammo_sprite.model
+                    del ammo_sprite
                 except:
                     pass
+                return
 
     def update_health_bar(self) :
         if(len(self.world.health_bar.items) > 0) :
@@ -175,13 +183,17 @@ class PlanetGameWindow(arcade.Window):
                 try:
                     self.world.meteorites.remove(meteorite_sprite.model)
                     self.meteorite_sprites.remove(meteorite_sprite)
+                    del meteorite_sprite.model
+                    del meteorite_sprite
                 except:
                     pass
+                return
 
     def remove_unuse_health_bar(self) :
         for health_bar_sprite in self.health_bar_sprites :
             if health_bar_sprite.model not in self.world.health_bar.items:
                 self.health_bar_sprites.remove(health_bar_sprite)
+                del health_bar_sprite
 
     def update_ui(self) :
         if self.present_score < self.world.score :
@@ -196,6 +208,7 @@ class PlanetGameWindow(arcade.Window):
             for bullet_sprite in self.bullet_sprites :
                 if bullet_sprite.model == bullet :
                     self.bullet_sprites.remove(bullet_sprite)
+                    del bullet_sprite
         elif message == 'new':
             self.bullet_sprites.append(ModelSprite('images/bullet.png', model=bullet))
 
@@ -205,6 +218,7 @@ class PlanetGameWindow(arcade.Window):
             for meteorite_sprite in self.meteorite_sprites :
                 if meteorite_sprite.model == meteorite :
                     self.meteorite_sprites.remove(meteorite_sprite)
+                    del meteorite_sprite
         elif message == 'new' :
             self.meteorite_sprites.append(ModelSprite('images/meteorite.png', model=meteorite))
 

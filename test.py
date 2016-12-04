@@ -1,19 +1,11 @@
 class EventListenner :
     def __init__(self) :
-        self.__handlers = []
+        self.mes = 'hello'
 
-    def add(self, handler) :
-        self.__handlers.append(handler)
+    def __del__(self) :
+        print('abc')
 
-    def notify(self, *args, **keywargs) :
-        for handler in self.__handlers :
-            handler(*args, **keywargs)
-
-class MyTest:
-    def __init__(self) :
-        self.listenner = EventListenner()
-
-    def update(self) :
-        for i in range(0,10) :
-            if i % 2 == 0 :
-                self.listenner.notify(i)
+a = EventListenner()
+print(a.mes)
+del a
+# print(a.mes)
