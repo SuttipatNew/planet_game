@@ -56,6 +56,9 @@ class PlanetGameWindow(arcade.Window):
         self.present_score = self.world.score
         self.present_ammo_num = self.world.ship.ammo_num
 
+        self.world.bullet_listenner.add(self.bullet_listenner_nofify)
+        self.world.meteorite_listenner.add(self.meteorite_listenner_notify)
+
     def on_draw(self):
         arcade.start_render()
         self.background.draw()
@@ -83,12 +86,8 @@ class PlanetGameWindow(arcade.Window):
 
     def animate(self, delta):
         self.world.animate(delta)
-        self.create_sprite_for_new_bullet()
-        self.remove_unuse_bullet_sprite()
         self.update_water_bar()
         self.update_health_bar()
-        self.create_sprite_for_new_meteorite()
-        self.remove_unuse_meteorite_sprite()
         self.remove_bullet_and_meteorite()
         self.ship_on_planet()
         self.create_sprite_for_new_ammo()
@@ -102,24 +101,7 @@ class PlanetGameWindow(arcade.Window):
 
     def on_key_release(self, key, key_modifiers):
         self.world.on_key_release(key, key_modifiers)
-
-    def create_sprite_for_new_bullet(self) :
-        if(len(self.world.bullets) > 0) :
-            for bullet in self.world.bullets :
-                sprite_exists = False
-                for bullet_sprite in self.bullet_sprites :
-                    if bullet == bullet_sprite.model :
-                        sprite_exists = True
-                        break
-                if not sprite_exists :
-                    self.bullet_sprites.append(ModelSprite('images/bullet.png', model=bullet))
-
-    def remove_unuse_bullet_sprite(self) :
-        if(len(self.bullet_sprites) > 0) :
-            for bullet_sprite in self.bullet_sprites :
-                if(bullet_sprite.model not in self.world.bullets) :
-                    self.bullet_sprites.remove(bullet_sprite)
-
+        
     def update_water_bar(self) :
         if(len(self.world.water_bar.items) > 0) :
             for water_bar in self.world.water_bar.items :
@@ -131,23 +113,6 @@ class PlanetGameWindow(arcade.Window):
                 if not sprite_exists :
                     self.water_bar_sprites.append(BarSprite('images/rect-blue.png', model=water_bar))
 
-    def create_sprite_for_new_meteorite(self) :
-        if(len(self.world.meteorites) > 0) :
-            for meteorite in self.world.meteorites :
-                sprite_exists = False
-                for meteorite_sprite in self.meteorite_sprites :
-                    if meteorite == meteorite_sprite.model :
-                        sprite_exists = True
-                        break
-                if not sprite_exists :
-                    self.meteorite_sprites.append(ModelSprite('images/meteorite.png', model=meteorite))
-
-    def remove_unuse_meteorite_sprite(self) :
-        if(len(self.meteorite_sprites) > 0) :
-            for meteorite_sprite in self.meteorite_sprites :
-                if(meteorite_sprite.model not in self.world.meteorites) :
-                    self.meteorite_sprites.remove(meteorite_sprite)
-
     def remove_bullet_and_meteorite(self) :
         for bullet_sprite in self.bullet_sprites :
             for meteorite_sprite in self.meteorite_sprites :
@@ -157,7 +122,9 @@ class PlanetGameWindow(arcade.Window):
                     self.world.score += 1
                     try:
                         self.world.bullets.remove(bullet_sprite.model)
+                        self.bullet_sprites.remove(bullet_sprite)
                         self.world.meteorites.remove(meteorite_sprite.model)
+                        self.meteorite_sprites.remove(meteorite_sprite)
                     except:
                         pass
 
@@ -207,6 +174,7 @@ class PlanetGameWindow(arcade.Window):
                     print('ship destroyed')
                 try:
                     self.world.meteorites.remove(meteorite_sprite.model)
+                    self.meteorite_sprites.remove(meteorite_sprite)
                 except:
                     pass
 
@@ -222,6 +190,23 @@ class PlanetGameWindow(arcade.Window):
             self.present_ammo_num += 1
         if self.present_ammo_num > self.world.ship.ammo_num :
             self.present_ammo_num -= 1
+
+    def bullet_listenner_nofify(self, message, bullet) :
+        if message == 'remove':
+            for bullet_sprite in self.bullet_sprites :
+                if bullet_sprite.model == bullet :
+                    self.bullet_sprites.remove(bullet_sprite)
+        elif message == 'new':
+            self.bullet_sprites.append(ModelSprite('images/bullet.png', model=bullet))
+
+
+    def meteorite_listenner_notify(self, message, meteorite) :
+        if message == 'remove':
+            for meteorite_sprite in self.meteorite_sprites :
+                if meteorite_sprite.model == meteorite :
+                    self.meteorite_sprites.remove(meteorite_sprite)
+        elif message == 'new' :
+            self.meteorite_sprites.append(ModelSprite('images/meteorite.png', model=meteorite))
 
 if __name__ == '__main__':
     window = PlanetGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)

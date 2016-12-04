@@ -113,6 +113,28 @@ class Ammo(Model) :
         super().__init__(world, x, y, 0)
         self.size = 5
 
+class BulletListenner :
+    def __init__(self) :
+        self.__handlers = []
+
+    def add(self, handler) :
+        self.__handlers.append(handler)
+
+    def notify(self, *args, **keywargs) :
+        for handler in self.__handlers :
+            handler(*args, **keywargs)
+
+class MeteoriteListenner :
+    def __init__(self) :
+        self.__handlers = []
+
+    def add(self, handler) :
+        self.__handlers.append(handler)
+
+    def notify(self, *args, **keywargs) :
+        for handler in self.__handlers :
+            handler(*args, **keywargs)
+
 class World:
     def __init__(self, width, height):
         self.width = width
@@ -133,6 +155,9 @@ class World:
         self.ammos = []
 
         self.water_bar_update_counter = time()
+
+        self.bullet_listenner = BulletListenner()
+        self.meteorite_listenner = MeteoriteListenner()
 
     def animate(self, delta):
         self.update()
@@ -192,21 +217,27 @@ class World:
                         y = self.height
                     else :
                         y = 0
-                self.meteorites.append(Meteorite(self, x, y))
+                new_item = Meteorite(self, x, y)
+                self.meteorites.append(new_item)
+                self.meteorite_listenner.notify('new', new_item)
 
     def create_bullet(self):
-        self.bullets.append(Bullet(self, self.ship.x, self.ship.y, self.ship.angle))
+        new_item = Bullet(self, self.ship.x, self.ship.y, self.ship.angle)
+        self.bullets.append(new_item)
+        self.bullet_listenner.notify('new', new_item)
 
     def bullets_animate(self, delta) :
         for bullet in self.bullets :
             bullet.animate(delta)
             if bullet.x < 0 or bullet.x > self.width or bullet.y < 0 or bullet.y > self.height :
+                self.bullet_listenner.notify('remove', bullet)
                 self.bullets.remove(bullet)
 
     def meteorites_animate(self, delta) :
         for meteorite in self.meteorites :
             meteorite.animate(delta)
             if meteorite.x < 0 or meteorite.x > self.width or meteorite.y < 0 or meteorite.y > self.height :
+                self.meteorite_listenner.notify('remove', meteorite)
                 self.meteorites.remove(meteorite)
 
     def ship_on_planet(self) :
