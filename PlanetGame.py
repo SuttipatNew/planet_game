@@ -40,13 +40,13 @@ class PlanetGameWindow(arcade.Window):
 
         arcade.set_background_color(arcade.color.BLACK)
 
-        self.background = arcade.Sprite('images/background.png')
+        self.background = arcade.Sprite('images/background_star.png')
         self.background.set_position(width/2, height/2)
 
         self.world = World(width, height)
 
         self.ship_sprite = ModelSprite('images/ship.png', model=self.world.ship)
-        self.planet_sprite = ModelSprite('images/planet2.png', model=self.world.planet)
+        self.planet_sprite = ModelSprite('images/planet3-1.png', model=self.world.planet)
         self.bullet_sprites = []
         self.water_bar_sprites = []
         self.health_bar_sprites = []
@@ -95,6 +95,7 @@ class PlanetGameWindow(arcade.Window):
         self.meteorite_hit_ship()
         self.remove_unuse_health_bar()
         self.update_ui()
+        self.update_planet()
 
     def on_key_press(self, key, key_modifiers):
         self.world.on_key_press(key, key_modifiers)
@@ -221,6 +222,19 @@ class PlanetGameWindow(arcade.Window):
                     del meteorite_sprite
         elif message == 'new' :
             self.meteorite_sprites.append(ModelSprite('images/meteorite.png', model=meteorite))
+
+    def update_planet(self) :
+        level = len(self.world.water_bar.items) / self.world.water_bar.max_size * 100
+        if level < 20 :
+            self.planet_sprite = ModelSprite('images/planet3-1.png', model=self.world.planet)
+        elif level < 40 :
+            self.planet_sprite = ModelSprite('images/planet3-2.png', model=self.world.planet)
+        elif level < 60 :
+            self.planet_sprite = ModelSprite('images/planet3-3.png', model=self.world.planet)
+        elif level < 80 :
+            self.planet_sprite = ModelSprite('images/planet3-4.png', model=self.world.planet)
+        elif level == 100 :
+            self.planet_sprite = ModelSprite('images/planet3-5.png', model=self.world.planet)
 
 if __name__ == '__main__':
     window = PlanetGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
