@@ -233,8 +233,10 @@ class PlanetGameWindow(arcade.Window):
             self.planet_sprite = ModelSprite('images/planet3-3.png', model=self.world.planet)
         elif level < 80 :
             self.planet_sprite = ModelSprite('images/planet3-4.png', model=self.world.planet)
-        elif level == 100 :
+        elif level < 100 :
             self.planet_sprite = ModelSprite('images/planet3-5.png', model=self.world.planet)
+        else :
+            self.planet_sprite = ModelSprite('images/planet3-6.png', model=self.world.planet)
 
 if __name__ == '__main__':
     window = PlanetGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
