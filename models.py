@@ -246,7 +246,7 @@ class World:
                 self.meteorites.remove(meteorite)
                 del meteorite
             elif math.fabs(meteorite.x - self.planet.x) < 40 and math.fabs(meteorite.y - self.planet.y) < 40 :
-                self.meteorite_listenner.notify('remove', meteorite)
+                self.meteorite_listenner.notify('hit_planet', meteorite)
                 self.meteorites.remove(meteorite)
                 del meteorite
 

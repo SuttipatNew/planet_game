@@ -43,6 +43,7 @@ class PlanetGameWindow(arcade.Window):
 
         self.on_menu = True
         self.selecting = 0
+        self.max_menu = 2
         self.selector_sprite = arcade.Sprite('images/selector.png')
         self.selector_sprite.set_position(200, 255)
 
@@ -50,11 +51,24 @@ class PlanetGameWindow(arcade.Window):
         self.menu_screen.set_position(width/2, height/2)
         self.menu_keys = []
 
+        self.instruction_screen = arcade.Sprite('images/instruction.jpg')
+        self.instruction_screen.set_position(width/2, height/2)
+        self.on_instruction = False
+
+        self.menu_prop = arcade.Sprite('images/planet3-6.png')
+        self.menu_prop_x = 650
+        self.menu_prop_y = 150
+        self.menu_prop_direction = 'up'
+        self.menu_prop.set_position(self.menu_prop_x, self.menu_prop_y)
+
     def on_draw(self):
         arcade.start_render()
-        if(self.on_menu) :
+        if self.on_menu :
             self.menu_screen.draw()
             self.selector_sprite.draw()
+            self.menu_prop.draw()
+        elif self.on_instruction :
+            self.instruction_screen.draw()
         else :
             self.background.draw()
             self.planet_sprite.draw()
@@ -85,6 +99,9 @@ class PlanetGameWindow(arcade.Window):
         if self.on_menu :
             self.update_menu()
             self.update_selector()
+            self.update_menu_prop()
+        elif self.on_instruction :
+            pass
         else :
             self.world.animate(delta)
             self.update_water_bar()
@@ -98,19 +115,39 @@ class PlanetGameWindow(arcade.Window):
             self.update_ui()
             self.update_planet()
 
+    def update_menu_prop(self) :
+        if self.menu_prop_y < 156 and self.menu_prop_direction == 'up':
+            self.menu_prop_y += 0.2
+        elif self.menu_prop_y >= 156 and self.menu_prop_direction == 'up':
+            self.menu_prop_direction = 'down'
+        elif self.menu_prop_y > 144 and self.menu_prop_direction == 'down':
+            self.menu_prop_y -= 0.2
+        elif self.menu_prop_y <= 144 and self.menu_prop_direction == 'down' :
+            self.menu_prop_direction = 'up'
+
+        self.menu_prop.set_position(self.menu_prop_x, self.menu_prop_y)
+
+    def update_instruction(self, key) :
+        if key == 65293 :
+            self.on_instruction = False
+            self.on_menu = True
+
     def update_menu(self) :
         if len(self.menu_keys) > 0 :
             # print(self.menu_keys)
             if 65362 in self.menu_keys :
                 self.selecting -= 1
-                self.selecting %= 2
+                self.selecting %= self.max_menu
             elif 65364 in self.menu_keys :
                 self.selecting += 1
-                self.selecting %= 2
+                self.selecting %= self.max_menu
             elif 65293 in self.menu_keys :
                 if self.selecting == 0 :
                     self.on_menu = False
                     self.init_game()
+                elif self.selecting == 1 :
+                    self.on_instruction = True
+                    self.on_menu = False
             self.menu_keys = []
 
     def update_selector(self) :
@@ -142,6 +179,8 @@ class PlanetGameWindow(arcade.Window):
     def on_key_press(self, key, key_modifiers):
         if self.on_menu :
             self.menu_keys.append(key)
+        elif self.on_instruction :
+            self.update_instruction(key)
         else :
             self.world.on_key_press(key, key_modifiers)
 
@@ -151,6 +190,8 @@ class PlanetGameWindow(arcade.Window):
                 self.menu_keys.remove(key)
             except :
                 pass
+        elif self.on_instruction :
+            pass
         else :
             self.world.on_key_release(key, key_modifiers)
 
@@ -273,6 +314,15 @@ class PlanetGameWindow(arcade.Window):
                     del meteorite_sprite
         elif message == 'new' :
             self.meteorite_sprites.append(ModelSprite('images/meteorite.png', model=meteorite))
+        elif message == 'hit_planet' :
+            try :
+                self.meteorite_listenner_notify('remove', meteorite)
+                self.world.water_bar.items.pop()
+                self.world.water_bar.items.pop()
+                self.water_bar_sprites.pop()
+                self.water_bar_sprites.pop()
+            except :
+                pass
 
     def update_planet(self) :
         level = len(self.world.water_bar.items) / self.world.water_bar.max_size * 100
