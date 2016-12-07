@@ -40,6 +40,12 @@ class PlanetGameWindow(arcade.Window):
 
         arcade.set_background_color(arcade.color.BLACK)
 
+        self.on_menu = True
+        self.selecting = 0
+        self.selector_sprite = arcade.Sprite('images/selector.png')
+        self.selector_sprite.set_position(100, 100)
+
+        self.menu_screen = arcade.Sprite('images/menu.png')
         self.background = arcade.Sprite('images/background_star.png')
         self.background.set_position(width/2, height/2)
 
@@ -83,6 +89,9 @@ class PlanetGameWindow(arcade.Window):
 
         arcade.draw_text("SCORE: " + str(self.present_score), self.width - 120, self.height - 30, arcade.color.WHITE, 16)
         arcade.draw_text("AMMO: " + str(self.present_ammo_num), self.width - 120, 20, arcade.color.WHITE, 16)
+
+        if(on_menu) :
+            self.menu_screen.draw()
 
     def animate(self, delta):
         self.world.animate(delta)
