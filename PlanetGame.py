@@ -231,6 +231,7 @@ class PlanetGameWindow(arcade.Window):
         self.world.bullet_listenner.add(self.bullet_listenner_nofify)
         self.world.meteorite_listenner.add(self.meteorite_listenner_notify)
         self.world.gameover_listenner.add(self.gameover_listenner_notify)
+        self.world.water_bar_full_listenner.add(self.water_bar_full_listenner_notify)
 
     def on_key_press(self, key, key_modifiers):
         if self.on_menu :
@@ -368,6 +369,9 @@ class PlanetGameWindow(arcade.Window):
         elif message == 'new':
             self.bullet_sprites.append(ModelSprite('images/bullet.png', model=bullet))
 
+    def water_bar_full_listenner_notify(self) :
+        self.water_bar_sprites = []
+        self.planet_sprite = ModelSprite('images/planet3-1.png', model=self.world.planet)
 
     def meteorite_listenner_notify(self, message, meteorite) :
         if message == 'remove':
@@ -396,11 +400,11 @@ class PlanetGameWindow(arcade.Window):
         elif level < 60 :
             self.planet_sprite = ModelSprite('images/planet3-3.png', model=self.world.planet)
         elif level < 80 :
-            self.planet_sprite = ModelSprite('images/planet3-4.png', model=self.world.planet)
-        elif level < 100 :
             self.planet_sprite = ModelSprite('images/planet3-5.png', model=self.world.planet)
-        else :
+        elif level < 100 :
             self.planet_sprite = ModelSprite('images/planet3-6.png', model=self.world.planet)
+        # else :
+        #     self.planet_sprite = ModelSprite('images/planet3-6.png', model=self.world.planet)
 
 if __name__ == '__main__':
     window = PlanetGameWindow(SCREEN_WIDTH, SCREEN_HEIGHT)

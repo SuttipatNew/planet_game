@@ -151,10 +151,24 @@ class GameOverListenner :
         for handler in self.__handlers :
             handler(*args, **keywargs)
 
+class WaterBarFullListenner :
+    def __init__(self) :
+        self.__handlers = []
+
+    def add(self, handler) :
+        self.__handlers.append(handler)
+
+    def notify(self, *args, **keywargs) :
+        for handler in self.__handlers :
+            handler(*args, **keywargs)
+
 class World:
     def __init__(self, width, height):
         self.width = width
         self.height = height
+
+        self.full_meteorites = 5
+        self.prob_meteorites = 0.01
 
         self.planet = Planet(self, 400, 300)
         self.ship = Ship(self, 100, 100)
@@ -175,6 +189,7 @@ class World:
         self.bullet_listenner = BulletListenner()
         self.meteorite_listenner = MeteoriteListenner()
         self.gameover_listenner = GameOverListenner()
+        self.water_bar_full_listenner = WaterBarFullListenner()
 
     def animate(self, delta):
         self.update()
@@ -219,8 +234,8 @@ class World:
                 pass
 
     def update_meteorites(self) :
-        if(len(self.meteorites) < 5) :
-            if random_prob(0.01) :
+        if(len(self.meteorites) < self.full_meteorites) :
+            if random_prob(self.prob_meteorites) :
                 rand_num = randint(0,3)
                 on_right = rand_num == 0
                 on_top = rand_num == 1
@@ -263,9 +278,10 @@ class World:
                 self.meteorites.remove(meteorite)
                 del meteorite
             elif math.fabs(meteorite.x - self.planet.x) < 40 and math.fabs(meteorite.y - self.planet.y) < 40 :
-                self.meteorite_listenner.notify('hit_planet', meteorite)
-                self.meteorites.remove(meteorite)
-                del meteorite
+                # self.meteorite_listenner.notify('hit_planet', meteorite)
+                # self.meteorites.remove(meteorite)
+                # del meteorite
+                self.gameover_listenner.notify()
 
     def ship_on_planet(self) :
         if time() - self.water_bar_update_counter >= 1 :
@@ -282,6 +298,10 @@ class World:
     def update_planet(self) :
         if len(self.water_bar.items) == self.water_bar.max_size :
             self.score += 100
+            self.water_bar.items = []
+            self.water_bar_full_listenner.notify()
+            self.full_meteorites += 2
+            self.prob_meteorites += 0.01
 
 
 def random_prob(prob) :
