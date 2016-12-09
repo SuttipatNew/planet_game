@@ -118,7 +118,7 @@ class Ammo(Model) :
         super().__init__(world, x, y, 0)
         self.size = 5
 
-class BulletListenner :
+class Listenner :
     def __init__(self) :
         self.__handlers = []
 
@@ -129,38 +129,6 @@ class BulletListenner :
         for handler in self.__handlers :
             handler(*args, **keywargs)
 
-class MeteoriteListenner :
-    def __init__(self) :
-        self.__handlers = []
-
-    def add(self, handler) :
-        self.__handlers.append(handler)
-
-    def notify(self, *args, **keywargs) :
-        for handler in self.__handlers :
-            handler(*args, **keywargs)
-
-class GameOverListenner :
-    def __init__(self) :
-        self.__handlers = []
-
-    def add(self, handler) :
-        self.__handlers.append(handler)
-
-    def notify(self, *args, **keywargs) :
-        for handler in self.__handlers :
-            handler(*args, **keywargs)
-
-class WaterBarFullListenner :
-    def __init__(self) :
-        self.__handlers = []
-
-    def add(self, handler) :
-        self.__handlers.append(handler)
-
-    def notify(self, *args, **keywargs) :
-        for handler in self.__handlers :
-            handler(*args, **keywargs)
 
 class World:
     def __init__(self, width, height):
@@ -186,10 +154,10 @@ class World:
 
         self.water_bar_update_counter = time()
 
-        self.bullet_listenner = BulletListenner()
-        self.meteorite_listenner = MeteoriteListenner()
-        self.gameover_listenner = GameOverListenner()
-        self.water_bar_full_listenner = WaterBarFullListenner()
+        self.bullet_listenner = Listenner()
+        self.meteorite_listenner = Listenner()
+        self.gameover_listenner = Listenner()
+        self.water_bar_full_listenner = Listenner()
 
     def animate(self, delta):
         self.update()
