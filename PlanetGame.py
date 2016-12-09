@@ -129,7 +129,6 @@ class PlanetGameWindow(arcade.Window):
             self.create_sprite_for_new_ammo()
             self.ship_pick_ammo()
             self.meteorite_hit_ship()
-            self.remove_unuse_health_bar()
             self.update_ui()
             self.update_planet()
 
@@ -333,8 +332,13 @@ class PlanetGameWindow(arcade.Window):
         for meteorite_sprite in self.meteorite_sprites :
             if arcade.check_for_collision(meteorite_sprite, self.ship_sprite) :
                 try:
-                    self.world.health_bar.items.pop()
-                    self.world.health_bar.items.pop()
+                    for i in range(2) :
+                        model = self.world.health_bar.items.pop()
+                        for health_bar_sprite in self.health_bar_sprites :
+                            if health_bar_sprite.model == model :
+                                self.health_bar_sprites.remove(health_bar_sprite)
+                                del health_bar_sprite.model
+                                del health_bar_sprite
                 except:
                     print('ship destroyed')
                 try:
@@ -345,12 +349,6 @@ class PlanetGameWindow(arcade.Window):
                 except:
                     pass
                 return
-
-    def remove_unuse_health_bar(self) :
-        for health_bar_sprite in self.health_bar_sprites :
-            if health_bar_sprite.model not in self.world.health_bar.items:
-                self.health_bar_sprites.remove(health_bar_sprite)
-                del health_bar_sprite
 
     def update_ui(self) :
         if self.present_score < self.world.score :
@@ -372,6 +370,8 @@ class PlanetGameWindow(arcade.Window):
     def water_bar_full_listenner_notify(self) :
         self.water_bar_sprites = []
         self.planet_sprite = ModelSprite('images/planet3-1.png', model=self.world.planet)
+        for i in range(self.world.health_bar.max_size - len(self.world.health_bar.items)) :
+            self.world.health_bar.add_item()
 
     def meteorite_listenner_notify(self, message, meteorite) :
         if message == 'remove':
