@@ -1,4 +1,5 @@
 from arcade import key
+import arcade
 from random import randint
 from random import random
 from time import time
@@ -139,6 +140,17 @@ class MeteoriteListenner :
         for handler in self.__handlers :
             handler(*args, **keywargs)
 
+class GameOverListenner :
+    def __init__(self) :
+        self.__handlers = []
+
+    def add(self, handler) :
+        self.__handlers.append(handler)
+
+    def notify(self, *args, **keywargs) :
+        for handler in self.__handlers :
+            handler(*args, **keywargs)
+
 class World:
     def __init__(self, width, height):
         self.width = width
@@ -162,6 +174,7 @@ class World:
 
         self.bullet_listenner = BulletListenner()
         self.meteorite_listenner = MeteoriteListenner()
+        self.gameover_listenner = GameOverListenner()
 
     def animate(self, delta):
         self.update()
@@ -181,6 +194,10 @@ class World:
         self.update_ship_fire()
 
         self.update_meteorites()
+
+        self.update_planet()
+
+        self.check_gameover()
 
 
     def on_key_press(self, key, key_modifiers):
@@ -257,6 +274,14 @@ class World:
 
     def create_ammo(self, x, y) :
         self.ammos.append(Ammo(self, x, y))
+
+    def check_gameover(self) :
+        if(len(self.health_bar.items) == 0) :
+            self.gameover_listenner.notify()
+
+    def update_planet(self) :
+        if len(self.water_bar.items) == self.water_bar.max_size :
+            self.score += 100
 
 
 def random_prob(prob) :

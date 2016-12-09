@@ -42,7 +42,8 @@ class PlanetGameWindow(arcade.Window):
         arcade.set_background_color(arcade.color.BLACK)
 
         self.on_menu = True
-        self.selecting = 0
+        # self.on_menu = False
+        self.menu_selecting = 0
         self.max_menu = 2
         self.selector_sprite = arcade.Sprite('images/selector.png')
         self.selector_sprite.set_position(200, 255)
@@ -61,6 +62,14 @@ class PlanetGameWindow(arcade.Window):
         self.menu_prop_direction = 'up'
         self.menu_prop.set_position(self.menu_prop_x, self.menu_prop_y)
 
+        self.gameover_screen = arcade.Sprite('images/gameover.jpg')
+        self.gameover_screen.set_position(width/2, height/2)
+        self.gameover = False
+        self.gameover_selecting = 0
+        self.gameover_keys = []
+        self.max_gameover_menu = 2
+        # self.gameover_listenner_notify()
+
     def on_draw(self):
         arcade.start_render()
         if self.on_menu :
@@ -69,6 +78,11 @@ class PlanetGameWindow(arcade.Window):
             self.menu_prop.draw()
         elif self.on_instruction :
             self.instruction_screen.draw()
+        elif self.gameover :
+            self.gameover_screen.draw()
+            self.selector_sprite.draw()
+            self.menu_prop.draw()
+            arcade.draw_text("SCORE: " + str(self.world.score), self.width / 2 - 50, self.height / 2, arcade.color.WHITE, 20)
         else :
             self.background.draw()
             self.planet_sprite.draw()
@@ -98,10 +112,14 @@ class PlanetGameWindow(arcade.Window):
     def animate(self, delta):
         if self.on_menu :
             self.update_menu()
-            self.update_selector()
+            self.update_selector_menu()
             self.update_menu_prop()
         elif self.on_instruction :
             pass
+        elif self.gameover :
+            self.update_menu_prop()
+            self.update_selector_gameover()
+            self.update_gameover()
         else :
             self.world.animate(delta)
             self.update_water_bar()
@@ -136,25 +154,62 @@ class PlanetGameWindow(arcade.Window):
         if len(self.menu_keys) > 0 :
             # print(self.menu_keys)
             if 65362 in self.menu_keys :
-                self.selecting -= 1
-                self.selecting %= self.max_menu
+                self.menu_selecting -= 1
+                self.menu_selecting %= self.max_menu
             elif 65364 in self.menu_keys :
-                self.selecting += 1
-                self.selecting %= self.max_menu
+                self.menu_selecting += 1
+                self.menu_selecting %= self.max_menu
             elif 65293 in self.menu_keys :
-                if self.selecting == 0 :
+                if self.menu_selecting == 0 :
                     self.on_menu = False
                     self.init_game()
-                elif self.selecting == 1 :
+                elif self.menu_selecting == 1 :
                     self.on_instruction = True
                     self.on_menu = False
+                    self.gameover = False
+                    self.menu_selecting = 0
             self.menu_keys = []
 
-    def update_selector(self) :
-        if self.selecting == 0 :
+    def update_selector_menu(self) :
+        if self.menu_selecting == 0 :
             self.selector_sprite.set_position(200, 255)
         else :
             self.selector_sprite.set_position(200, 190)
+
+    def gameover_listenner_notify(self) :
+        self.gameover = True
+        self.on_menu = False
+        self.on_instruction = False
+        self.selector_sprite.set_position(280, 180)
+        self.gameover_selecting = 0
+
+    def update_selector_gameover(self) :
+        if self.gameover_selecting == 0 :
+            self.selector_sprite.set_position(280, 180)
+        elif self.gameover_selecting == 1 :
+            self.selector_sprite.set_position(280, 110)
+
+    def update_gameover(self) :
+        if len(self.gameover_keys) > 0 :
+            # print(self.menu_keys)
+            if 65362 in self.gameover_keys :
+                self.gameover_selecting -= 1
+                self.gameover_selecting %= self.max_gameover_menu
+            elif 65364 in self.gameover_keys :
+                self.gameover_selecting += 1
+                self.gameover_selecting %= self.max_gameover_menu
+            elif 65293 in self.gameover_keys :
+                if self.gameover_selecting == 0 :
+                    self.on_menu = False
+                    self.on_instruction = False
+                    self.gameover = False
+                    self.init_game()
+                elif self.gameover_selecting == 1 :
+                    self.on_instruction = False
+                    self.gameover = False
+                    self.on_menu = True
+                self.gameover_selecting = 0
+            self.gameover_keys = []
 
     def init_game(self) :
         self.background = arcade.Sprite('images/background_star.png')
@@ -175,12 +230,15 @@ class PlanetGameWindow(arcade.Window):
 
         self.world.bullet_listenner.add(self.bullet_listenner_nofify)
         self.world.meteorite_listenner.add(self.meteorite_listenner_notify)
+        self.world.gameover_listenner.add(self.gameover_listenner_notify)
 
     def on_key_press(self, key, key_modifiers):
         if self.on_menu :
             self.menu_keys.append(key)
         elif self.on_instruction :
             self.update_instruction(key)
+        elif self.gameover :
+            self.gameover_keys.append(key)
         else :
             self.world.on_key_press(key, key_modifiers)
 
@@ -192,6 +250,11 @@ class PlanetGameWindow(arcade.Window):
                 pass
         elif self.on_instruction :
             pass
+        elif self.gameover :
+            try :
+                self.gameover_keys.remove(key)
+            except :
+                pass
         else :
             self.world.on_key_release(key, key_modifiers)
 
