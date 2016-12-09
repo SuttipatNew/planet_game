@@ -1,4 +1,5 @@
 import arcade
+from time import time
 from models import World, Ship, random_prob
 
 SCREEN_WIDTH = 800
@@ -230,6 +231,8 @@ class PlanetGameWindow(arcade.Window):
         self.world.gameover_listenner.add(self.gameover_listenner_notify)
         self.world.water_bar_full_listenner.add(self.water_bar_full_listenner_notify)
 
+        self.water_bar_decrease_timer = time()
+
     def on_key_press(self, key, key_modifiers):
         if self.on_menu :
             self.menu_keys.append(key)
@@ -290,6 +293,17 @@ class PlanetGameWindow(arcade.Window):
     def ship_on_planet(self) :
         if arcade.check_for_collision(self.ship_sprite, self.planet_sprite) :
             self.world.ship_on_planet()
+            self.water_bar_decrease_timer = time()
+        elif time() - self.water_bar_decrease_timer >= 2:
+            self.water_bar_decrease_timer = time()
+            try :
+                item = self.world.water_bar.items.pop()
+                for water_bar_sprite in self.water_bar_sprites :
+                    if water_bar_sprite.model == item :
+                        self.water_bar_sprites.remove(water_bar_sprite)
+                        break
+            except :
+                pass
 
     def create_sprite_for_new_ammo(self) :
         if(len(self.world.ammos) > 0) :
