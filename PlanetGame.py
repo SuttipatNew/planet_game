@@ -1,6 +1,7 @@
 import arcade
 from time import time
-from models import World, Ship, random_prob
+from models import Ship, random_prob
+from world import World
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
