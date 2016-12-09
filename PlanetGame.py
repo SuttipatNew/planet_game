@@ -104,10 +104,8 @@ class PlanetGameWindow(arcade.Window):
                 health_bar_sprite.draw()
 
 
-            arcade.draw_text("SCORE: " + str(self.present_score), self.width - 120, self.height - 30, arcade.color.WHITE, 16)
+            arcade.draw_text("SCORE: " + str(self.present_score), self.width - 150, self.height - 30, arcade.color.WHITE, 16)
             arcade.draw_text("AMMO: " + str(self.present_ammo_num), self.width - 120, 20, arcade.color.WHITE, 16)
-
-
 
     def animate(self, delta):
         if self.on_menu :
@@ -372,6 +370,7 @@ class PlanetGameWindow(arcade.Window):
         self.planet_sprite = ModelSprite('images/planet3-1.png', model=self.world.planet)
         for i in range(self.world.health_bar.max_size - len(self.world.health_bar.items)) :
             self.world.health_bar.add_item()
+        self.world.ship.ammo_num += 10
 
     def meteorite_listenner_notify(self, message, meteorite) :
         if message == 'remove':
