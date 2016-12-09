@@ -8,12 +8,11 @@ class World:
         self.full_meteorites = 5
         self.prob_meteorites = 0.01
 
+        self.water = 0
+        self.full_water = 10
+
         self.planet = Planet(self, 400, 300)
         self.ship = Ship(self, 100, 100)
-        self.water_bar = WaterBar(self, self.planet.x,self.planet.y + 100, 40)
-        self.health_bar = HealthBar(self, self.ship.x, self.ship.y + 80, 20, self.ship)
-        for i in range(self.health_bar.max_size) :
-            self.health_bar.add_item()
 
         self.score = 0
 
@@ -34,7 +33,6 @@ class World:
         self.ship.animate(delta)
         self.bullets_animate(delta)
         self.meteorites_animate(delta)
-        self.health_bar.animate(delta)
 
     def update(self):
         up = key.W in self.key_list
@@ -116,27 +114,30 @@ class World:
                 self.meteorites.remove(meteorite)
                 del meteorite
             elif math.fabs(meteorite.x - self.planet.x) < 40 and math.fabs(meteorite.y - self.planet.y) < 40 :
-                # self.meteorite_listenner.notify('hit_planet', meteorite)
-                # self.meteorites.remove(meteorite)
-                # del meteorite
                 self.gameover_listenner.notify()
 
     def ship_on_planet(self) :
         if time() - self.water_bar_update_counter >= 1 :
             self.water_bar_update_counter = time()
-            self.water_bar.add_item()
+            if self.water < self.full_water :
+                self.water += 1
 
     def create_ammo(self, x, y) :
         self.ammos.append(Ammo(self, x, y))
 
     def check_gameover(self) :
-        if(len(self.health_bar.items) == 0) :
+        if self.ship.health <= 0 :
             self.gameover_listenner.notify()
 
     def update_planet(self) :
-        if len(self.water_bar.items) == self.water_bar.max_size :
+        if self.water == self.full_water :
             self.score += 100
-            self.water_bar.items = []
+            self.water = 0
+            self.full_water += 10
+            if self.ship.full_health < 40 :
+                self.ship.full_health += 2
+            self.ship.health = self.ship.full_health
+            self.ship.ammo_num += 10
             self.water_bar_full_listenner.notify()
             self.full_meteorites += 2
             self.prob_meteorites += 0.01

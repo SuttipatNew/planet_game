@@ -2,6 +2,7 @@ import arcade
 from time import time
 from models import Ship, random_prob
 from world import World
+import pyglet.gl as gl
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -99,12 +100,16 @@ class PlanetGameWindow(arcade.Window):
             for meteorite_sprite in self.meteorite_sprites:
                 meteorite_sprite.draw()
 
-            for water_bar_sprite in self.water_bar_sprites:
-                water_bar_sprite.draw()
+            gl.glDisable(gl.GL_TEXTURE_2D)
+            ship = self.world.ship
+            planet = self.world.planet
+            water = self.world.water
+            full_water = self.world.full_water
 
-            for health_bar_sprite in self.health_bar_sprites :
-                health_bar_sprite.draw()
-
+            arcade.draw_lrtb_rectangle_filled(ship.x - ship.full_health * 4 / 2, \
+             ship.x - ship.full_health * 4 / 2 + ship.health * 4, ship.y + 60, ship.y + 56, arcade.color.RED)
+            arcade.draw_lrtb_rectangle_filled(planet.x - full_water * 4 / 2 , \
+             planet.x - full_water * 4 / 2 + water * 4, planet.y + 100, planet.y + 90, (0, 174, 239))
 
             arcade.draw_text("SCORE: " + str(self.present_score), self.width - 150, self.height - 30, arcade.color.WHITE, 16)
             arcade.draw_text("AMMO: " + str(self.present_ammo_num), self.width - 120, 20, arcade.color.WHITE, 16)
@@ -122,8 +127,6 @@ class PlanetGameWindow(arcade.Window):
             self.update_gameover()
         else :
             self.world.animate(delta)
-            self.update_water_bar()
-            self.update_health_bar()
             self.remove_bullet_and_meteorite()
             self.ship_on_planet()
             self.create_sprite_for_new_ammo()
@@ -219,8 +222,6 @@ class PlanetGameWindow(arcade.Window):
         self.ship_sprite = ModelSprite('images/ship.png', model=self.world.ship)
         self.planet_sprite = ModelSprite('images/planet3-1.png', model=self.world.planet)
         self.bullet_sprites = []
-        self.water_bar_sprites = []
-        self.health_bar_sprites = []
         self.meteorite_sprites = []
         self.ammo_sprites = []
 
@@ -260,17 +261,6 @@ class PlanetGameWindow(arcade.Window):
         else :
             self.world.on_key_release(key, key_modifiers)
 
-    def update_water_bar(self) :
-        if(len(self.world.water_bar.items) > 0) :
-            for water_bar in self.world.water_bar.items :
-                sprite_exists = False
-                for water_bar_sprite in self.water_bar_sprites :
-                    if water_bar == water_bar_sprite.model :
-                        sprite_exists = True
-                        break
-                if not sprite_exists :
-                    self.water_bar_sprites.append(BarSprite('images/rect-blue.png', model=water_bar))
-
     def remove_bullet_and_meteorite(self) :
         for bullet_sprite in self.bullet_sprites :
             for meteorite_sprite in self.meteorite_sprites :
@@ -297,14 +287,8 @@ class PlanetGameWindow(arcade.Window):
             self.water_bar_decrease_timer = time()
         elif time() - self.water_bar_decrease_timer >= 2:
             self.water_bar_decrease_timer = time()
-            try :
-                item = self.world.water_bar.items.pop()
-                for water_bar_sprite in self.water_bar_sprites :
-                    if water_bar_sprite.model == item :
-                        self.water_bar_sprites.remove(water_bar_sprite)
-                        break
-            except :
-                pass
+            if self.world.water > 0 :
+                self.world.water -= 1
 
     def create_sprite_for_new_ammo(self) :
         if(len(self.world.ammos) > 0) :
@@ -330,29 +314,12 @@ class PlanetGameWindow(arcade.Window):
                     pass
                 return
 
-    def update_health_bar(self) :
-        if(len(self.world.health_bar.items) > 0) :
-            for health_bar in self.world.health_bar.items :
-                sprite_exists = False
-                for health_bar_sprite in self.health_bar_sprites :
-                    if health_bar == health_bar_sprite.model :
-                        sprite_exists = True
-                        break
-                if not sprite_exists :
-                    self.health_bar_sprites.append(BarSprite('images/rect-red.png', model=health_bar))
-
     def meteorite_hit_ship(self) :
         for meteorite_sprite in self.meteorite_sprites :
             if arcade.check_for_collision(meteorite_sprite, self.ship_sprite) :
-                try:
-                    for i in range(2) :
-                        model = self.world.health_bar.items.pop()
-                        for health_bar_sprite in self.health_bar_sprites :
-                            if health_bar_sprite.model == model :
-                                self.health_bar_sprites.remove(health_bar_sprite)
-                                del health_bar_sprite.model
-                                del health_bar_sprite
-                except:
+                if self.world.ship.health > 0 :
+                    self.world.ship.health -= 1
+                else :
                     print('ship destroyed')
                 try:
                     self.world.meteorites.remove(meteorite_sprite.model)
@@ -381,11 +348,7 @@ class PlanetGameWindow(arcade.Window):
             self.bullet_sprites.append(ModelSprite('images/bullet.png', model=bullet))
 
     def water_bar_full_listenner_notify(self) :
-        self.water_bar_sprites = []
         self.planet_sprite = ModelSprite('images/planet3-1.png', model=self.world.planet)
-        for i in range(self.world.health_bar.max_size - len(self.world.health_bar.items)) :
-            self.world.health_bar.add_item()
-        self.world.ship.ammo_num += 10
 
     def meteorite_listenner_notify(self, message, meteorite) :
         if message == 'remove':
@@ -398,15 +361,12 @@ class PlanetGameWindow(arcade.Window):
         elif message == 'hit_planet' :
             try :
                 self.meteorite_listenner_notify('remove', meteorite)
-                self.world.water_bar.items.pop()
-                self.world.water_bar.items.pop()
-                self.water_bar_sprites.pop()
-                self.water_bar_sprites.pop()
+                self.world.water -= 2
             except :
                 pass
 
     def update_planet(self) :
-        level = len(self.world.water_bar.items) / self.world.water_bar.max_size * 100
+        level = self.world.water / self.world.full_water * 100
         if level < 20 :
             self.planet_sprite = ModelSprite('images/planet3-1.png', model=self.world.planet)
         elif level < 40 :

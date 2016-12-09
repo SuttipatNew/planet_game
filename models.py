@@ -12,32 +12,13 @@ class Model:
         self.y = y
         self.angle = angle
 
-class Bar:
-    def __init__(self, world, x, y, max_size, width) :
-        self.x = x
-        self.y = y
-        self.max_size = max_size
-        self.width = width
-        self.items = []
-
-    def add_item(self) :
-        if len(self.items) >= self.max_size :
-            return
-        if len(self.items) == 0 :
-            self.items.append(Item(self, self.x - self.max_size / 2 * self.width, self.y))
-            return
-        self.items.append(Item(self, self.items[len(self.items) - 1].x + self.width, self.y))
-
-class Item:
-    def __init__(self, world, x, y):
-        self.x = x
-        self.y = y
-
 class Ship(Model):
 
     def __init__(self, world, x, y):
         super().__init__(world, x, y, 90)
         self.ammo_num = 10
+        self.full_health = 10
+        self.health = self.full_health
 
     def animate(self, delta):
         if self.y > self.world.height:
@@ -70,29 +51,6 @@ class Bullet(Model) :
     def animate(self, delta) :
         self.x += math.cos(math.radians(self.angle)) * 4
         self.y += math.sin(math.radians(self.angle)) * 4
-
-class WaterBar(Bar) :
-    width = 4
-    height = 16
-    def __init__(self, world, x, y, max_size) :
-        super().__init__(world, x, y, max_size, WaterBar.width)
-
-class HealthBar(Bar) :
-    width = 4
-    height = 4
-    def __init__(self, world, x, y, max_size, ship) :
-        super().__init__(world, x, y, max_size, HealthBar.width)
-        self.ship = ship
-
-    def animate(self, delta) :
-        self.x = self.ship.x
-        self.y = self.ship.y + 80
-        for i in range(len(self.items)) :
-            if i == 0 :
-                self.items[i].x = self.x - self.max_size / 2 * self.width
-            else :
-                self.items[i].x = self.items[i - 1].x + self.width
-            self.items[i].y = self.y
 
 class Meteorite(Model) :
     def __init__(self, world, x, y):
