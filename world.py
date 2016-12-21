@@ -30,7 +30,6 @@ class World:
 
     def animate(self, delta):
         self.update()
-        self.ship.animate(delta)
         self.bullets_animate(delta)
         self.meteorites_animate(delta)
 

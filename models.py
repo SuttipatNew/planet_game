@@ -19,20 +19,20 @@ class Ship(Model):
         self.ammo_num = 10
         self.full_health = 10
         self.health = self.full_health
-
-    def animate(self, delta):
-        if self.y > self.world.height:
-            self.y = 0
-        if self.x > self.world.width :
-            self. x = 0
+        self.world = world
 
     def move(self, up, down):
+        world = self.world
         if up :
-            self.x += math.cos(math.radians(self.angle)) * 2
-            self.y += math.sin(math.radians(self.angle)) * 2
+            if (self.x > 0 and self.x < world.width) or (self.x <= 0 and math.cos(math.radians(self.angle)) > 0) or (self.x >= world.width and math.cos(math.radians(self.angle)) < 0)  :
+                self.x += math.cos(math.radians(self.angle)) * 2
+            if (self.y > 0 and self.y < world.height) or (self.x <= 0 and math.sin(math.radians(self.angle)) > 0) or (self.x >= world.height and math.sin(math.radians(self.angle)) < 0)  :
+                self.y += math.sin(math.radians(self.angle)) * 2
         if down :
-            self.x -= math.cos(math.radians(self.angle)) * 2
-            self.y -= math.sin(math.radians(self.angle)) * 2
+            if (self.x > 0 and self.x < world.width) or (self.x <= 0 and -math.cos(math.radians(self.angle)) > 0) or (self.x >= world.width and -math.cos(math.radians(self.angle)) < 0)  :
+                self.x -= math.cos(math.radians(self.angle)) * 2
+            if (self.y > 0 and self.y < world.height) or (self.x <= 0 and -math.sin(math.radians(self.angle)) > 0) or (self.x >= world.height and -math.sin(math.radians(self.angle)) < 0)  :
+                self.y -= math.sin(math.radians(self.angle)) * 2
 
     def turn(self, left, right):
         if left :
