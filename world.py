@@ -1,4 +1,5 @@
 from models import *
+from sound import Sound
 
 class World:
     def __init__(self, width, height):
@@ -27,6 +28,8 @@ class World:
         self.meteorite_listenner = Listenner()
         self.gameover_listenner = Listenner()
         self.water_bar_full_listenner = Listenner()
+
+        self.sound = Sound()
 
     def animate(self, delta):
         self.update()
@@ -62,6 +65,10 @@ class World:
     def update_ship_fire(self) :
         if key.SPACE in self.key_list and self.ship.ammo_num > 0:
             self.create_bullet()
+            # try :
+            #     self.sound.play_fire()
+            # except :
+            #     pass
             self.ship.ammo_num -= 1
             try:
                 self.key_list.remove(key.SPACE)
