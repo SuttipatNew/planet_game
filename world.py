@@ -30,6 +30,7 @@ class World:
         self.water_bar_full_listenner = Listenner()
 
         self.sound = Sound()
+        self.sound.play_bgm()
 
     def animate(self, delta):
         self.update()
@@ -65,10 +66,10 @@ class World:
     def update_ship_fire(self) :
         if key.SPACE in self.key_list and self.ship.ammo_num > 0:
             self.create_bullet()
-            # try :
-            #     self.sound.play_fire()
-            # except :
-            #     pass
+            try :
+                self.sound.play_fire()
+            except :
+                pass
             self.ship.ammo_num -= 1
             try:
                 self.key_list.remove(key.SPACE)
@@ -120,6 +121,7 @@ class World:
                 self.meteorites.remove(meteorite)
                 del meteorite
             elif math.fabs(meteorite.x - self.planet.x) < 40 and math.fabs(meteorite.y - self.planet.y) < 40 :
+                self.sound.stop_bgm()
                 self.gameover_listenner.notify()
 
     def ship_on_planet(self) :
