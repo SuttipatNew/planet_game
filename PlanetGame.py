@@ -74,6 +74,7 @@ class PlanetGameWindow(arcade.Window):
         self.gameover_keys = []
         self.max_gameover_menu = 2
         self.sound = Sound()
+        self.pause = False
 
     def on_draw(self):
         arcade.start_render()
@@ -88,6 +89,10 @@ class PlanetGameWindow(arcade.Window):
             self.selector_sprite.draw()
             self.menu_prop.draw()
             arcade.draw_text("SCORE: " + str(self.world.score), self.width / 2 - 50, self.height / 2, arcade.color.WHITE, 20)
+        elif self.pause:
+            self.background.draw()
+            arcade.draw_text('PAUSE', self.width / 2 - 50, self.height / 2, arcade.color.WHITE, 25)
+            self.menu_prop.draw()
         else :
             self.background.draw()
             self.planet_sprite.draw()
@@ -117,6 +122,7 @@ class PlanetGameWindow(arcade.Window):
             arcade.draw_text("AMMO: " + str(self.present_ammo_num), self.width - 120, 20, arcade.color.WHITE, 16)
 
     def animate(self, delta):
+        self.sound.update()
         if self.on_menu :
             self.update_menu()
             self.update_selector_menu()
@@ -127,6 +133,8 @@ class PlanetGameWindow(arcade.Window):
             self.update_menu_prop()
             self.update_selector_gameover()
             self.update_gameover()
+        elif self.pause:
+            self.update_menu_prop()
         else :
             self.world.animate(delta)
             self.remove_bullet_and_meteorite()
@@ -202,12 +210,15 @@ class PlanetGameWindow(arcade.Window):
         if len(self.gameover_keys) > 0 :
             # print(self.menu_keys)
             if 65362 in self.gameover_keys :
+                self.action_sound('change')
                 self.gameover_selecting -= 1
                 self.gameover_selecting %= self.max_gameover_menu
             elif 65364 in self.gameover_keys :
+                self.action_sound('change')
                 self.gameover_selecting += 1
                 self.gameover_selecting %= self.max_gameover_menu
             elif 65293 in self.gameover_keys :
+                self.action_sound('select')
                 if self.gameover_selecting == 0 :
                     self.on_menu = False
                     self.on_instruction = False
@@ -245,6 +256,7 @@ class PlanetGameWindow(arcade.Window):
 
         self.water_bar_decrease_timer = time()
 
+        self.sound.gameover = False
         self.action_sound('bgm')
 
 
@@ -255,8 +267,16 @@ class PlanetGameWindow(arcade.Window):
             self.update_instruction(key)
         elif self.gameover :
             self.gameover_keys.append(key)
+        elif self.pause:
+            if key == arcade.key.P:
+                self.pause = False
+                self.sound.bgm_player.play()
         else :
-            self.world.on_key_press(key, key_modifiers)
+            if key == arcade.key.P:
+                self.pause = True
+                self.sound.bgm_player.pause()
+            else:
+                self.world.on_key_press(key, key_modifiers)
 
     def on_key_release(self, key, key_modifiers):
         if self.on_menu :

@@ -34,16 +34,19 @@ class Sound:
             self.bgm_player.next()
             self.bgm = pyglet.media.load('sound/bgm.mp3')
             self.bgm_player.queue(self.bgm)
+            self.bgm_player.play()
         elif message == 'bomb':
             self.bomb_player.next()
             self.bomb = pyglet.media.load('sound/explosion.wav')
             self.bomb_player.queue(self.bomb)
 
+    def update(self):
         if not self.gameover:
             self.fire_player.play()
             self.ammo_player.play()
             self.bomb_player.play()
             self.full_water_player.play()
-            self.bgm_player.play()
+        else:
+            self.bgm_player.pause()
 
         self.menu_player.play()

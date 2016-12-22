@@ -26,12 +26,12 @@ class Ship(Model):
         if up :
             if (self.x > 0 and self.x < world.width) or (self.x <= 0 and math.cos(math.radians(self.angle)) > 0) or (self.x >= world.width and math.cos(math.radians(self.angle)) < 0)  :
                 self.x += math.cos(math.radians(self.angle)) * 2
-            if (self.y > 0 and self.y < world.height) or (self.x <= 0 and math.sin(math.radians(self.angle)) > 0) or (self.x >= world.height and math.sin(math.radians(self.angle)) < 0)  :
+            if (self.y > 0 and self.y < world.height) or (self.y <= 0 and math.sin(math.radians(self.angle)) > 0) or (self.y >= world.height and math.sin(math.radians(self.angle)) < 0)  :
                 self.y += math.sin(math.radians(self.angle)) * 2
         if down :
             if (self.x > 0 and self.x < world.width) or (self.x <= 0 and -math.cos(math.radians(self.angle)) > 0) or (self.x >= world.width and -math.cos(math.radians(self.angle)) < 0)  :
                 self.x -= math.cos(math.radians(self.angle)) * 2
-            if (self.y > 0 and self.y < world.height) or (self.x <= 0 and -math.sin(math.radians(self.angle)) > 0) or (self.x >= world.height and -math.sin(math.radians(self.angle)) < 0)  :
+            if (self.y > 0 and self.y < world.height) or (self.y <= 0 and -math.sin(math.radians(self.angle)) > 0) or (self.y >= world.height and -math.sin(math.radians(self.angle)) < 0)  :
                 self.y -= math.sin(math.radians(self.angle)) * 2
 
     def turn(self, left, right):
