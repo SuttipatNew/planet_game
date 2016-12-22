@@ -139,6 +139,7 @@ class World:
 
     def update_planet(self) :
         if self.water == self.full_water :
+            self.sound.play_full_water()
             self.score += 100
             self.water = 0
             self.full_water += 10
@@ -149,3 +150,6 @@ class World:
             self.water_bar_full_listenner.notify()
             self.full_meteorites += 2
             self.prob_meteorites += 0.01
+
+    def explosion(self):
+        self.sound.play_explosion()
