@@ -1,44 +1,26 @@
-import arcade
+import pyglet
 class Sound:
     def __init__(self) :
-        self.fire = arcade.sound.load_sound('sound/fire.mp3')
-        self.bgm = arcade.sound.load_sound('sound/bgm.mp3')
-        self.full_water = arcade.sound.load_sound('sound/coin.wav')
-        self.bomb = arcade.sound.load_sound('sound/explosion.wav')
-        self.ammo = arcade.sound.load_sound('sound/ammo.wav')
+        self.player = pyglet.media.Player()
+        self.sound = None
+        self.bgm = pyglet.media.load('sound/bgm.mp3')
+        self.full_water = pyglet.media.load('sound/coin.wav')
+        self.bomb = pyglet.media.load('sound/explosion.wav')
+        self.ammo = pyglet.media.load('sound/ammo.wav')
 
-    def play_fire(self) :
-        try :
-            arcade.sound.play_sound(self.fire)
-        except :
-            pass
+        self.change_sound = pyglet.media.load('sound/change.mp3')
+        self.select_sound = pyglet.media.load('sound/select.mp3')
 
-    def play_bgm(self):
-        try :
-            arcade.sound.play_sound(self.bgm)
-        except :
-            pass
-
-    def stop_bgm(self):
-        try:
-            self.bgm.stop()
-        except:
-            pass
-
-    def play_full_water(self):
-        try:
-            arcade.sound.play_sound(self.full_water)
-        except:
-            pass
-
-    def play_explosion(self):
-        try:
-            arcade.sound.play_sound(self.bomb)
-        except:
-            pass
-
-    def play_ammo(self):
-        try:
-            arcade.sound.play_sound(self.ammo)
-        except:
-            pass
+    def play(self, message) :
+        self.player.next()
+        if message == 'fire':
+            self.sound = pyglet.media.load('sound/fire.mp3')
+        elif message == 'change':
+            self.sound = pyglet.media.load('sound/change.mp3')
+        elif message == 'select':
+            self.sound = pyglet.media.load('sound/select.mp3')
+        else:
+            self.sound = None
+        if self.sound != None:
+            self.player.queue(self.sound)
+        self.player.play()

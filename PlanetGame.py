@@ -3,6 +3,8 @@ from time import time
 from models import Ship, random_prob
 from world import World
 import pyglet.gl as gl
+import pyglet
+from sound import Sound
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -71,9 +73,7 @@ class PlanetGameWindow(arcade.Window):
         self.gameover_selecting = 0
         self.gameover_keys = []
         self.max_gameover_menu = 2
-
-        self.change_sound = arcade.sound.load_sound('sound/change.mp3')
-        self.select_sound = arcade.sound.load_sound('sound/select.mp3')
+        self.sound = Sound()
 
     def on_draw(self):
         arcade.start_render()
@@ -151,7 +151,7 @@ class PlanetGameWindow(arcade.Window):
 
     def update_instruction(self, key) :
         if key == 65293 :
-            self.select_sound.play()
+            self.action_sound('select')
             self.on_instruction = False
             self.on_menu = True
 
@@ -159,15 +159,15 @@ class PlanetGameWindow(arcade.Window):
         if len(self.menu_keys) > 0 :
             # print(self.menu_keys)
             if 65362 in self.menu_keys :
-                self.change_sound.play()
+                self.action_sound('change')
                 self.menu_selecting -= 1
                 self.menu_selecting %= self.max_menu
             elif 65364 in self.menu_keys :
-                self.change_sound.play()
+                self.action_sound('change')
                 self.menu_selecting += 1
                 self.menu_selecting %= self.max_menu
             elif 65293 in self.menu_keys :
-                self.select_sound.play()
+                self.action_sound('select')
                 if self.menu_selecting == 0 :
                     self.on_menu = False
                     self.init_game()
@@ -219,11 +219,14 @@ class PlanetGameWindow(arcade.Window):
                 self.gameover_selecting = 0
             self.gameover_keys = []
 
+    def action_sound(self, message):
+        self.sound.play(message)
+
     def init_game(self) :
         self.background = arcade.Sprite('images/background_star.png')
         self.background.set_position(self.width/2, self.height/2)
-
         self.world = World(self.width, self.height)
+        self.world.action_listenner.add(self.action_sound)
 
         self.ship_sprite = ModelSprite('images/ship.png', model=self.world.ship)
         self.planet_sprite = ModelSprite('images/planet3-1.png', model=self.world.planet)
@@ -240,6 +243,7 @@ class PlanetGameWindow(arcade.Window):
         self.world.water_bar_full_listenner.add(self.water_bar_full_listenner_notify)
 
         self.water_bar_decrease_timer = time()
+
 
     def on_key_press(self, key, key_modifiers):
         if self.on_menu :
@@ -274,7 +278,6 @@ class PlanetGameWindow(arcade.Window):
                     if random_prob(0.5) :
                         self.world.create_ammo(meteorite_sprite.model.x, meteorite_sprite.model.y)
                     self.world.score += 1
-                    self.world.sound.play_explosion()
                     try:
                         self.world.bullets.remove(bullet_sprite.model)
                         self.bullet_sprites.remove(bullet_sprite)
@@ -311,7 +314,6 @@ class PlanetGameWindow(arcade.Window):
     def ship_pick_ammo(self) :
         for ammo_sprite in self.ammo_sprites :
             if arcade.check_for_collision(ammo_sprite, self.ship_sprite) :
-                self.world.sound.play_ammo()
                 self.world.ship.ammo_num += ammo_sprite.model.size
                 try:
                     self.world.ammos.remove(ammo_sprite.model)
@@ -325,7 +327,6 @@ class PlanetGameWindow(arcade.Window):
     def meteorite_hit_ship(self) :
         for meteorite_sprite in self.meteorite_sprites :
             if arcade.check_for_collision(meteorite_sprite, self.ship_sprite) :
-                self.world.sound.play_explosion()
                 if self.world.ship.health > 0 :
                     self.world.ship.health -= 1
                 else :

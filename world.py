@@ -1,5 +1,4 @@
 from models import *
-from sound import Sound
 
 class World:
     def __init__(self, width, height):
@@ -28,9 +27,7 @@ class World:
         self.meteorite_listenner = Listenner()
         self.gameover_listenner = Listenner()
         self.water_bar_full_listenner = Listenner()
-
-        self.sound = Sound()
-        self.sound.play_bgm()
+        self.action_listenner = Listenner()
 
     def animate(self, delta):
         self.update()
@@ -66,10 +63,7 @@ class World:
     def update_ship_fire(self) :
         if key.SPACE in self.key_list and self.ship.ammo_num > 0:
             self.create_bullet()
-            try :
-                self.sound.play_fire()
-            except :
-                pass
+            self.action_listenner.notify('fire')
             self.ship.ammo_num -= 1
             try:
                 self.key_list.remove(key.SPACE)
@@ -121,7 +115,6 @@ class World:
                 self.meteorites.remove(meteorite)
                 del meteorite
             elif math.fabs(meteorite.x - self.planet.x) < 40 and math.fabs(meteorite.y - self.planet.y) < 40 :
-                self.sound.stop_bgm()
                 self.gameover_listenner.notify()
 
     def ship_on_planet(self) :
@@ -139,7 +132,7 @@ class World:
 
     def update_planet(self) :
         if self.water == self.full_water :
-            self.sound.play_full_water()
+            self.action_listenner('full_water')
             self.score += 100
             self.water = 0
             self.full_water += 10
@@ -150,6 +143,3 @@ class World:
             self.water_bar_full_listenner.notify()
             self.full_meteorites += 2
             self.prob_meteorites += 0.01
-
-    def explosion(self):
-        self.sound.play_explosion()
