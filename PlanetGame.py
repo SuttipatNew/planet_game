@@ -185,6 +185,7 @@ class PlanetGameWindow(arcade.Window):
             self.selector_sprite.set_position(200, 190)
 
     def gameover_listenner_notify(self) :
+        self.sound.gameover = True
         self.gameover = True
         self.on_menu = False
         self.on_instruction = False
@@ -244,6 +245,8 @@ class PlanetGameWindow(arcade.Window):
 
         self.water_bar_decrease_timer = time()
 
+        self.action_sound('bgm')
+
 
     def on_key_press(self, key, key_modifiers):
         if self.on_menu :
@@ -275,6 +278,7 @@ class PlanetGameWindow(arcade.Window):
         for bullet_sprite in self.bullet_sprites :
             for meteorite_sprite in self.meteorite_sprites :
                 if arcade.check_for_collision(bullet_sprite, meteorite_sprite) :
+                    self.action_sound('bomb')
                     if random_prob(0.5) :
                         self.world.create_ammo(meteorite_sprite.model.x, meteorite_sprite.model.y)
                     self.world.score += 1
@@ -314,6 +318,7 @@ class PlanetGameWindow(arcade.Window):
     def ship_pick_ammo(self) :
         for ammo_sprite in self.ammo_sprites :
             if arcade.check_for_collision(ammo_sprite, self.ship_sprite) :
+                self.action_sound('ammo')
                 self.world.ship.ammo_num += ammo_sprite.model.size
                 try:
                     self.world.ammos.remove(ammo_sprite.model)
@@ -327,6 +332,7 @@ class PlanetGameWindow(arcade.Window):
     def meteorite_hit_ship(self) :
         for meteorite_sprite in self.meteorite_sprites :
             if arcade.check_for_collision(meteorite_sprite, self.ship_sprite) :
+                self.action_sound('bomb')
                 if self.world.ship.health > 0 :
                     self.world.ship.health -= 1
                 else :

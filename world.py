@@ -132,7 +132,7 @@ class World:
 
     def update_planet(self) :
         if self.water == self.full_water :
-            self.action_listenner('full_water')
+            self.action_listenner.notify('full_water')
             self.score += 100
             self.water = 0
             self.full_water += 10
