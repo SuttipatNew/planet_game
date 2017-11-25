@@ -120,8 +120,9 @@ class PlanetGameWindow(arcade.Window):
 
             arcade.draw_text("SCORE: " + str(self.present_score), self.width - 150, self.height - 30, arcade.color.WHITE, 16)
             arcade.draw_text("AMMO: " + str(self.present_ammo_num), self.width - 120, 20, arcade.color.WHITE, 16)
+        self.animate()
 
-    def animate(self, delta):
+    def animate(self):
         self.sound.update()
         if self.on_menu :
             self.update_menu()
@@ -136,7 +137,7 @@ class PlanetGameWindow(arcade.Window):
         elif self.pause:
             self.update_menu_prop()
         else :
-            self.world.animate(delta)
+            self.world.animate(1)
             self.remove_bullet_and_meteorite()
             self.ship_on_planet()
             self.create_sprite_for_new_ammo()
